@@ -1,0 +1,12 @@
+{
+  "all": {
+    "publicOutputDir": "assets/mobile/vite",
+    "sourceCodeDir": "app/frontend",
+    "watchAdditionalPaths": []
+  },
+  "development": {
+    "autoBuild": true,
+    "publicOutputDir": "assets/mobile/vite-dev",
+    "port": 3036
+  }
+}

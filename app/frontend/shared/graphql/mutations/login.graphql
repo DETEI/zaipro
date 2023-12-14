@@ -1,0 +1,19 @@
+mutation login($input: LoginInput!) {
+  login(input: $input) {
+    session {
+      id
+      afterAuth {
+        type
+        data
+      }
+    }
+    errors {
+      ...errors
+    }
+    twoFactorRequired {
+      availableTwoFactorAuthenticationMethods
+      defaultTwoFactorAuthenticationMethod
+      recoveryCodesAvailable
+    }
+  }
+}

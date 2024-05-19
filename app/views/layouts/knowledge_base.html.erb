@@ -9,6 +9,7 @@
       data-primary-locale="<%= (filter_primary_kb_locale || all_locales.first)&.locale %>">
 
 <meta charset="utf-8">
+<%= link_to 'Regresar', root_path, class: 'btn btn-secondary' %>
 <title><%= kb_public_page_title(@knowledge_base, @object, @page_title_error) %></title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <%= render partial: 'knowledge_base/public/feeds_header' if @knowledge_base.show_feed_icon %>

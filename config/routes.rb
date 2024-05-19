@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   root to: 'init#index', via: :get
   root to: 'errors#routing', via: %i[post put delete options], as: nil
 
+  resources :feedbacks
+  
   # load routes from external files
   dir = File.expand_path(__dir__)
   files = Dir.glob("#{dir}/routes/*.rb")

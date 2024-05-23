@@ -1,2 +1,5 @@
 # This file is not used by Zammad, configuration happens in:
 #   config/initializers/action_cable_preferences.rb
+development:
+  adapter: redis
+  url: redis://localhost:6379/1

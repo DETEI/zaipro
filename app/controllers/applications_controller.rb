@@ -3,6 +3,7 @@
 class ApplicationsController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
 
+
   def index
     all = Doorkeeper::Application.all
     if response_full?

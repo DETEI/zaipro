@@ -27,9 +27,44 @@
           <div class="js-ticketTitleContainer ticket-title"></div>
           <div class="js-ticketMetaContainer"></div>
         </div>
-      </div>
+      </div> 
+      <br>
+      <% if !@ticket.feedback_solved && @ticket.state_id == 4:%>
+        <button id="feedbackButton" class="btn btn-primary openfeedback" style="display: block; margin: 0 auto; text-align: center;" onclick="handleFeedbackClick()">Dejar Feedback</button>
+      <% else : %>
+        <button id="feedbackButtonNone" class="btn btn-primary openfeedback" style="display: none; margin: 0 auto; text-align: center;">Dejar Feedback</button>
+      <% end %>
       <div class="ticket-article"></div>
       <div class="article-new"></div>
+    </div>
+  </div>
+
+  <div id="feedbackModal" class="feedback_modal" style="display:none;">
+    <div class="modal-content">
+      <form id="feedbackForm">
+        <input type="hidden" id="ticket_id" name="ticket_id" value="<%- @ticket.id %>">
+        <div>
+          <label>¿Se solucionó el problema?</label>
+          <select id="problem_solved" class="form-control">
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Calificación del asesor (1 al 5):</label>
+          <input type="number" id="advisor_rating" min="1" max="5" step="1" class="form-control">
+        </div>
+
+        <div>
+          <label>Comentarios:</label>
+          <textarea id="comments" class="form-control"></textarea>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
     </div>
   </div>
 

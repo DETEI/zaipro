@@ -12,6 +12,10 @@ class TicketPolicy < ApplicationPolicy
     access?('create')
   end
 
+  def create_feedback?
+    access?('create_feedback')
+  end
+  
   def update?
     access?('change')
   end

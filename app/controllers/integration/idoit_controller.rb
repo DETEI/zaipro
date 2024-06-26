@@ -1,10 +1,10 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Integration::IdoitController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
 
   def verify
-    response = ::Idoit.verify(params[:api_token], params[:endpoint], params[:client_id])
+    response = ::Idoit.verify(params[:api_token], params[:endpoint], params[:client_id], verify_ssl: params[:verify_ssl])
     render json: {
       result:   'ok',
       response: response,

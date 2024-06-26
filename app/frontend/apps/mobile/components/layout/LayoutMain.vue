@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { headerOptions as header } from '#mobile/composables/useHeader.ts'
@@ -46,12 +46,6 @@ const { stickyStyles } = useStickyHeader([title], headerElement)
     >
       <!-- let's see how it feels without transition -->
       <RouterView />
-      <!-- TODO check when we will have more time -->
-      <!-- <router-view #default="{ Component }">
-        <TransitionViewNavigation>
-          <component :is="Component" />
-        </TransitionViewNavigation>
-      </router-view> -->
       <div v-if="showBottomNavigation" class="BottomNavigationPadding"></div>
     </main>
     <LayoutBottomNavigation v-if="showBottomNavigation" />

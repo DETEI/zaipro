@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/application_model_examples'
@@ -831,7 +831,7 @@ RSpec.describe Trigger, type: :model do
 
       context 'is in working time' do
         let(:condition) do
-          { 'ticket.state_id' => { 'operator' => 'is', 'value' => Ticket::State.all.pluck(:id) }, 'execution_time.calendar_id' => { 'operator' => 'is in working time', 'value' => calendar.id } }
+          { 'ticket.state_id' => { 'operator' => 'is', 'value' => Ticket::State.pluck(:id) }, 'execution_time.calendar_id' => { 'operator' => 'is in working time', 'value' => calendar.id } }
         end
 
         it 'does trigger only in working time' do
@@ -876,7 +876,7 @@ RSpec.describe Trigger, type: :model do
         }
       end
       let(:condition) do
-        { 'ticket.state_id' => { 'operator' => 'is', 'value' => Ticket::State.all.pluck(:id) } }
+        { 'ticket.state_id' => { 'operator' => 'is', 'value' => Ticket::State.pluck(:id) } }
       end
       let!(:system_address) do
         create(:email_address)

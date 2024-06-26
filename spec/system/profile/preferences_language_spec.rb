@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -128,7 +128,8 @@ RSpec.describe 'Profile > Language', type: :system do
         fill_in 'customer_id_completion', with: customer
         send_keys(:enter, :tab)
         find('[data-name="body"]').set(title)
-        select 'Users', from: 'group_id'
+        group = Group.find_by(name: 'Users')
+        set_tree_select_value('group_id', group.name)
       end
 
       include_examples 'have translations in ticket page', translated_element
@@ -223,7 +224,7 @@ RSpec.describe 'Profile > Language', type: :system do
         fill_in 'customer_id_completion', with: customer
         send_keys(:enter, :tab)
         find('[data-name="body"]').set(title)
-        select 'Users', from: 'group_id'
+        set_tree_select_value('group_id', Group.first.name)
       end
 
       include_examples 'have translations in ticket page', translated_element

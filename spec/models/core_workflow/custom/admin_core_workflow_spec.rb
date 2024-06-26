@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/core_workflow/base'
@@ -55,6 +55,20 @@ RSpec.describe CoreWorkflow::Custom::AdminCoreWorkflow, mariadb: true, type: :mo
 
     it 'does show screen edit' do
       expect(result[:restrict_values]['preferences::screen']).to include('edit')
+    end
+  end
+
+  describe 'Error when selecting Group in core workflow #4868' do
+    let(:payload) do
+      base_payload.merge(
+        'screen'     => 'edit',
+        'class_name' => 'CoreWorkflow',
+        'params'     => { 'object' => 'Group' },
+      )
+    end
+
+    it 'does not throw error after object selection' do
+      expect { result }.not_to raise_error
     end
   end
 end

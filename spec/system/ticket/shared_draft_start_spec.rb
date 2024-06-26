@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -57,7 +57,7 @@ RSpec.describe 'Ticket Shared Draft Start', authenticated_as: :authenticate, typ
 
       it 'not visible when group with disabled draft selected' do
         within(:active_content) do
-          select another_group.name, from: 'group_id'
+          set_tree_select_value('group_id', another_group.name)
         end
 
         expect(page).to have_no_selector :draft_sidebar_button
@@ -65,7 +65,7 @@ RSpec.describe 'Ticket Shared Draft Start', authenticated_as: :authenticate, typ
 
       it 'visible when group with active draft selected' do
         within(:active_content) do
-          select group.name, from: 'group_id'
+          set_tree_select_value('group_id', group.name)
         end
 
         expect(page).to have_selector :draft_sidebar_button
@@ -210,7 +210,7 @@ RSpec.describe 'Ticket Shared Draft Start', authenticated_as: :authenticate, typ
         click '.js-delete'
       end
 
-      click_on 'Yes'
+      click_button 'Yes'
 
       expect(Ticket::SharedDraftStart).not_to be_exist(draft.id)
 

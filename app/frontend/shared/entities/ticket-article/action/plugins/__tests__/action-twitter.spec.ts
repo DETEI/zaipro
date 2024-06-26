@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type {
   TicketArticle,
@@ -9,7 +9,7 @@ import { mockAccount } from '#tests/support/mock-account.ts'
 import { mockApplicationConfig } from '#tests/support/mock-applicationConfig.ts'
 import { setupView } from '#tests/support/mock-user.ts'
 import { nextTick } from 'vue'
-import { createArticleTypes } from '..'
+import { createArticleTypes } from '../index.ts'
 import {
   createEligibleTicketArticleReplyData,
   createTestArticleActions,

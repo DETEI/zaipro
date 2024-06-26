@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Zammad::SettingTypesGenerator < Rails::Generators::Base
 
@@ -20,7 +20,7 @@ class Zammad::SettingTypesGenerator < Rails::Generators::Base
   def generate_types_file_content
     fields = []
 
-    Setting.all.reorder(:name).each do |setting|
+    Setting.reorder(:name).each do |setting|
       if setting.frontend
         type = build_type(setting)
         fields.push("  #{setting.name}#{type}")

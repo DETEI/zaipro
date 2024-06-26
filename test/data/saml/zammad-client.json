@@ -1,5 +1,5 @@
 {
-  "clientId": "ZAMMAD_BASE_URL/auth/saml/metadata",
+  "clientId": "#ZAMMAD_BASE_URL/auth/saml/metadata",
   "name": "Zammad",
   "description": "",
   "surrogateAuthRequired": false,
@@ -8,10 +8,10 @@
   "clientAuthenticatorType": "client-secret",
   "secret": "sgExDFx8OGfCooRBwDYLIV5NnDAzVBey",
   "redirectUris": [
-    "ZAMMAD_BASE_URL/auth/saml/callback"
+    "#ZAMMAD_BASE_URL/auth/saml/callback"
   ],
   "webOrigins": [
-    "ZAMMAD_BASE_URL"
+    "#ZAMMAD_BASE_URL"
   ],
   "notBefore": 0,
   "bearerOnly": false,
@@ -28,11 +28,11 @@
     "saml.force.post.binding": "true",
     "saml.encrypt": "false",
     "post.logout.redirect.uris": "+",
-    "saml_assertion_consumer_url_post": "ZAMMAD_BASE_URL/auth/saml/callback",
+    "saml_assertion_consumer_url_post": "#ZAMMAD_BASE_URL/auth/saml/callback",
     "saml.server.signature": "true",
     "saml.server.signature.keyinfo.ext": "false",
     "saml.artifact.binding.identifier": "j8oyl9s6Zci93v0jdlB0lEAYaEU=",
-    "saml_single_logout_service_url_redirect": "ZAMMAD_BASE_URL/auth/saml/slo",
+    "saml_single_logout_service_url_redirect": "#ZAMMAD_BASE_URL/auth/saml/slo",
     "saml.signature.algorithm": "RSA_SHA256",
     "saml_force_name_id_format": "false",
     "saml.client.signature": "false",

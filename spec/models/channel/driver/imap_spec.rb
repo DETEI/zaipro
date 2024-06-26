@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -8,9 +8,10 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
     it 'succeeds' do
 
       params = {
-        host:     ENV['MAIL_SERVER'],
-        user:     ENV['MAIL_ADDRESS_ASCII'],
-        password: ENV['MAIL_PASS_ASCII'],
+        host:       ENV['MAIL_SERVER'],
+        user:       ENV['MAIL_ADDRESS_ASCII'],
+        password:   ENV['MAIL_PASS_ASCII'],
+        ssl_verify: false,
       }
 
       result = described_class.new.fetch(params, nil, 'check')
@@ -82,6 +83,7 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
           user:           ENV['MAIL_ADDRESS'],
           password:       server_password,
           ssl:            true,
+          ssl_verify:     false,
           folder:         folder,
           keep_on_server: false,
         }
@@ -91,12 +93,13 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
       {
         adapter: 'smtp',
         options: {
-          host:      server_address,
-          port:      25,
-          start_tls: true,
-          user:      server_login,
-          password:  server_password,
-          email:     email_address.email
+          host:       server_address,
+          port:       25,
+          start_tls:  true,
+          ssl_verify: false,
+          user:       server_login,
+          password:   server_password,
+          email:      email_address.email
         },
       }
     end
@@ -158,6 +161,7 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
               user:           ENV['MAIL_ADDRESS'],
               password:       server_password,
               ssl:            true,
+              ssl_verify:     false,
               folder:         folder,
               keep_on_server: true,
             }
@@ -283,10 +287,6 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
       end
       let(:oversized_email_md5) { Digest::MD5.hexdigest(oversized_email) }
       let(:oversized_email_size) { format('%<MB>.2f', MB: oversized_email.size.to_f / 1024 / 1024) }
-      let(:oversized_eml_folder) { Rails.root.join('var/spool/oversized_mail') }
-      let(:oversized_eml_file) do
-        Dir.entries(oversized_eml_folder).grep(%r{^#{oversized_email_md5}\.eml$}).map { |path| oversized_eml_folder.join(path) }.last
-      end
 
       let(:fetch_oversized_email) do
         imap.append(folder, oversized_email, [], Time.zone.now)
@@ -316,14 +316,7 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
         end
 
         it 'creates email reply correctly' do
-          # 1. verify that the oversized email has been saved locally to:
-          # var/spool/oversized_mail/yyyy-mm-ddThh:mm:ss-:md5.eml
-          expect(oversized_eml_file).to be_present
-
-          # verify that the file is byte for byte identical to the sent message
-          expect(File.read(oversized_eml_file)).to eq(oversized_email)
-
-          # 2. verify that a postmaster response email has been sent to the sender
+          # verify that a postmaster response email has been sent to the sender
           expect(oversized_email_reply).to be_present
 
           # parse the reply mail and verify the various headers
@@ -339,7 +332,7 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
           # verify the reply mail body content
           expect(parsed_oversized_email_reply[:body]).to match(%r{^Dear Max Mustermann.*Oversized Email Message.*#{oversized_email_size} MB.*0.1 MB.*#{Setting.get('fqdn')}}sm)
 
-          # 3. check if original mail got removed
+          # check if original mail got removed
           imap.select(folder)
           expect(imap.sort(['DATE'], ['ALL'], 'US-ASCII')).to be_empty
         end
@@ -354,74 +347,33 @@ RSpec.describe Channel::Driver::Imap, integration: true, required_envs: %w[MAIL_
 
         it 'does not create email reply' do
 
-          # 1. verify that email was not locally processed
-          expect(oversized_eml_file).to be_nil
-
-          # 2. verify that no postmaster response email has been sent
+          # verify that no postmaster response email has been sent
           imap.select('inbox')
           sleep 1
           expect(imap.sort(['DATE'], ['ALL'], 'US-ASCII').count).to be_zero
 
-          # 3. check that original mail is still there
+          # check that original mail is still there
           imap.select(folder)
           expect(imap.sort(['DATE'], ['ALL'], 'US-ASCII').count).to be(1)
         end
       end
     end
+  end
 
-    describe 'iCloud emails are not fetchable via IMAP #4589', required_envs: %w[ICLOUD_USER ICLOUD_PASS] do
-      let(:server_address) { 'imap.mail.me.com' }
-      let(:server_login)    { ENV['ICLOUD_USER'] }
-      let(:server_password) { ENV['ICLOUD_PASS'] }
-      let(:email_address)   { create(:email_address, name: 'Zammad Helpdesk', email: ENV['ICLOUD_USER']) }
-      let(:group)           { create(:group, email_address: email_address) }
-      let(:inbound_options) do
-        {
-          'adapter' => 'imap',
-          'options' => {
-            'host'           => server_address,
-            'user'           => ENV['ICLOUD_USER'],
-            'password'       => ENV['ICLOUD_PASS'],
-            'folder'         => folder,
-            'keep_on_server' => false,
-            'port'           => '993',
-          }
-        }
+  describe '.fetch_message_body_key' do
+    context 'with icloud mail server' do
+      let(:host) { 'imap.mail.me.com' }
+
+      it 'fetches mails with BODY field' do
+        expect(described_class.new.fetch_message_body_key({ 'host' => host })).to eq('BODY[]')
       end
-      let(:outbound_options) do
-        {
-          'adapter' => 'smtp',
-          'options' => {
-            'host'     => 'smtp.mail.me.com',
-            'user'     => ENV['ICLOUD_USER'],
-            'password' => ENV['ICLOUD_PASS'],
-            'port'     => '587'
-          },
-          'email'   => ENV['ICLOUD_USER']
-        }
-      end
+    end
 
-      let(:body) { SecureRandom.uuid }
-      let(:email1) do
-        <<~EMAIL.gsub(%r{\n}, "\r\n")
-          Subject: hello1
-          From: shugo@example.com
-          To: shugo@example.com
-          Message-ID: <some1@example_keep_on_server>
+    context 'with another mail server' do
+      let(:host) { 'any.server.com' }
 
-          #{body}
-        EMAIL
-      end
-
-      it 'does handle mails' do
-        imap.append(folder, email1, [], Time.zone.now)
-
-        # verify if message is still on server
-        message_ids = imap.sort(['DATE'], ['ALL'], 'US-ASCII')
-        expect(message_ids.count).to be(1)
-
-        expect { channel.fetch(true) }.to change(Ticket::Article, :count)
-        expect(Ticket::Article.where('body LIKE ?', "%#{body}%").count).to eq(1)
+      it 'fetches mails with RFC822 field' do
+        expect(described_class.new.fetch_message_body_key({ 'host' => host })).to eq('RFC822')
       end
     end
   end

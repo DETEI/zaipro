@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class CoreWorkflow::Result::BaseOption < CoreWorkflow::Result::Backend
   def remove_excluded_param_values
@@ -58,7 +58,7 @@ class CoreWorkflow::Result::BaseOption < CoreWorkflow::Result::Backend
   end
 
   def restore_array
-    new_value = @result_object.payload_backup['params'][field] & @result_object.result[:restrict_values][field]
+    new_value = @result_object.payload_backup['params'][field].map(&:to_s) & @result_object.result[:restrict_values][field]
 
     new_value_rerun(field, new_value)
 
@@ -67,7 +67,7 @@ class CoreWorkflow::Result::BaseOption < CoreWorkflow::Result::Backend
 
   def restore_string
     new_value = @result_object.payload_backup['params'][field]
-    return if @result_object.result[:restrict_values][field].exclude?(new_value)
+    return if excluded_by_restrict_values?(new_value)
 
     new_value_rerun(field, new_value)
 

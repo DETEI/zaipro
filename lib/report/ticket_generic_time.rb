@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Report::TicketGenericTime
 
@@ -171,6 +171,7 @@ returns
     selector.merge!(without_merged_tickets) # do not show merged tickets in reports
 
     result = SearchIndexBackend.selectors('Ticket', selector, { current_user: params[:current_user], limit: limit }, aggs_interval)
+    result[:ticket_ids] = result.delete(:object_ids)
     return result if params[:sheet].present?
 
     assets = {}

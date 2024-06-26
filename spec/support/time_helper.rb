@@ -1,10 +1,13 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module TimeHelperCache
   %w[travel travel_to freeze_time travel_back].each do |method_name|
     define_method method_name do |*args, **kwargs, &blk|
       super(*args, **kwargs, &blk).tap do
         Rails.cache.clear
+      rescue Errno::EISDIR
+        # suppress race condition errors
+      ensure
         Setting.class_variable_set :@@last_changed_at, 1.second.ago # rubocop:disable Style/ClassVars
       end
     end

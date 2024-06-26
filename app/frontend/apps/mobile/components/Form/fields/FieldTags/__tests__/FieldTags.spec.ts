@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { FormKit } from '@formkit/vue'
 import {
@@ -13,6 +13,7 @@ import type { MockGraphQLInstance } from '#tests/support/mock-graphql-api.ts'
 import { waitUntil } from '#tests/support/utils.ts'
 import { mockGraphQLApi } from '#tests/support/mock-graphql-api.ts'
 import type { FieldTagsProps } from '#shared/components/Form/fields/FieldTags/types.ts'
+import type { FormFieldContext } from '#shared/components/Form/types/field.ts'
 
 const defaultTags = [
   { label: 'test', value: 'test' },
@@ -22,7 +23,11 @@ const defaultTags = [
 
 let mockApi: MockGraphQLInstance
 
-const renderFieldTags = (props: Partial<FieldTagsProps> = {}) => {
+const renderFieldTags = (
+  props: Partial<
+    FieldTagsProps & { options: FormFieldContext['options'] }
+  > = {},
+) => {
   mockApi = mockGraphQLApi(AutocompleteSearchTagDocument).willResolve({
     autocompleteSearchTag: defaultTags,
   })
@@ -268,6 +273,25 @@ describe('creating new tag', () => {
 
       expect(view.getByRole('option', { name: 'pay' })).toBeInTheDocument()
       expect(filterInput).toHaveDisplayValue('')
+    },
+  )
+
+  it.each(['{Enter}', '{Tab}', ','])(
+    'can not add new tag with "%s" key when disabled',
+    async (key) => {
+      const view = renderFieldTags({ canCreate: false })
+
+      const node = view.getByLabelText('Tags')
+      await view.events.click(node)
+
+      const filterInput = view.getByPlaceholderText('Tag name…')
+
+      await view.events.type(filterInput, `pay${key}`)
+
+      expect(
+        view.queryByRole('option', { name: 'pay' }),
+      ).not.toBeInTheDocument()
+      expect(filterInput).toHaveDisplayValue('pay')
     },
   )
 

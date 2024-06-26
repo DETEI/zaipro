@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -9,7 +9,7 @@ RSpec.describe 'Ticket Shared Drafts Start API endpoints', authenticated_as: :ag
   let(:group_c) { create(:group, shared_drafts: false) }
   let(:group_d) { create(:group, shared_drafts: true) }
 
-  let(:role_group_d) { create(:role, groups: [group_d]) }
+  let(:role_group_d) { create(:role, :agent, groups: [group_d]) }
 
   let(:draft_a) { create(:ticket_shared_draft_start, group: group_a) }
   let(:draft_b) { create(:ticket_shared_draft_start, group: group_b) }

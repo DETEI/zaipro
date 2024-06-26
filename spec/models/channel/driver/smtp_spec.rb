@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -75,11 +75,12 @@ RSpec.describe Channel::Driver::Smtp, integration: true, required_envs: %w[MAIL_
         options['outbound'] = {
           adapter: 'smtp',
           options: {
-            host:      server_host,
-            port:      25,
-            start_tls: true,
-            user:      server_login,
-            password:  server_password,
+            host:       server_host,
+            port:       25,
+            start_tls:  true,
+            user:       server_login,
+            password:   server_password,
+            ssl_verify: false,
           },
         }
       end

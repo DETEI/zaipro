@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -202,7 +202,7 @@ RSpec.describe 'Ticket create > Secure mailing', authenticated_as: :authenticate
         within(:active_content) do
           use_template(template)
 
-          select new_group.name, from: 'group_id'
+          set_tree_select_value('group_id', new_group.name)
         end
       end
 

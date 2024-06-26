@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Subscriptions
   class PublicLinkUpdates < BaseSubscription
@@ -14,7 +14,7 @@ module Gql::Subscriptions
     end
 
     def update(screen:)
-      { public_links: PublicLink.all.select { |link| link[:screen].include?(screen) } }
+      { public_links: PublicLink.select { |link| link[:screen].include?(screen) } }
     end
   end
 end

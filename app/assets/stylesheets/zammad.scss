@@ -2,6 +2,7 @@ $high-priority-color: hsl(360, 71%, 60%);
 $low-priority-color: hsl(200, 68%, 73%);
 $minWidth: 1024px;
 $sidebarWidth: 280px;
+$desktopSidebarWidth: 360px;
 $navigationWidth: 260px;
 $mobileNavigationWidth: 50px;
 $mobileNavigationWidthOpen: 220px;
@@ -429,6 +430,23 @@ ul {
   }
 }
 
+.u-breakNormal.u-breakNormal {
+  word-break: normal;
+
+  @supports (overflow-wrap: normal) {
+    overflow-wrap: normal;
+  }
+}
+
+.u-breakWords.u-breakWords {
+  word-break: break-word;
+
+  @supports (overflow-wrap: break-word) {
+    overflow-wrap: break-word;
+    word-break: unset;
+  }
+}
+
 .zIndex-1 {
   z-index: 100;
 }
@@ -473,6 +491,10 @@ ul {
   z-index: 1100;
 }
 
+.zIndex-12 {
+  z-index: 1200;
+}
+
 .clickCatcher {
   top: 0;
   left: 0;
@@ -514,7 +536,9 @@ ul {
 
 /* close commented backslash hack */
 
-[contenteditable] {
+/* Avoid too broad selectors, since they can affect unintended elements in third-party extensions (#5073). */
+[contenteditable='true'],
+.richtext-content[contenteditable] {
   display: block;
   outline-style: none;
   border-radius: 3px;
@@ -522,27 +546,27 @@ ul {
   /* needed to make empty tags editable, otherwise no focus can be set */
   min-height: 10px;
   min-width: 20px;
-}
 
-[contenteditable]:hover,
-[contenteditable]:focus {
-  background: var(--background-primary);
-}
+  &:hover,
+  &:focus {
+    background: var(--background-primary);
+  }
 
-[contenteditable]:focus {
-  text-overflow: clip !important;
-}
+  &:focus {
+    text-overflow: clip !important;
+  }
 
-[contenteditable].invalid {
-  background: #f92;
-}
+  &.invalid {
+    background: #f92;
+  }
 
-[contenteditable] > .placeholder {
-  color: var(--text-muted);
-}
+  & > .placeholder {
+    color: var(--text-muted);
+  }
 
-[contenteditable] p {
-  margin: 0;
+  p {
+    margin: 0;
+  }
 }
 
 /* fix for placeholder */
@@ -2032,6 +2056,14 @@ fieldset > .form-group {
     pointer-events: none;
     cursor: not-allowed !important;
   }
+
+  &.form-group--nested {
+    @include bidi-style(padding-left, 30px, padding-right, 30px);
+  }
+
+  &.form-group--wide {
+    @include bidi-style(margin-left, -30px, margin-right, -30px);
+  }
 }
 
 .date.form-group .controls {
@@ -2483,6 +2515,12 @@ input.time.time--12 {
   }
 }
 
+.richtext.is-readonly [contenteditable='false'] {
+  cursor: default;
+  opacity: 1;
+  padding: 7px 12px;
+}
+
 .richtext.form-control .attachments.attachments--list:not(:empty) {
   border-top: 1px solid var(--background-modifier-border);
   white-space: normal;
@@ -2544,7 +2582,7 @@ select[multiple]:focus {
 .select.form-group,
 .user_autocompletion.form-group {
   .form-control:not([multiple]) {
-    padding-right: 21px;
+    @include ltr(padding-right, 21px);
   }
 }
 
@@ -2560,6 +2598,35 @@ select[multiple]:focus {
   height: 7px;
 
   @extend .u-unclickable;
+}
+
+.dropdown-clear {
+  position: absolute;
+  padding: 1px;
+
+  @include bidi-style(right, 12px, left, auto);
+
+  &--with-arrow-icon {
+    @include bidi-style(right, 35px, left, auto);
+  }
+
+  top: 50%;
+  margin-top: -7px;
+  border: 1px solid transparent;
+
+  .icon-diagonal-cross {
+    display: block;
+    width: 10px;
+    height: 10px;
+    fill: var(--interactive-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-radius: 3px;
+    border-color: var(--border-highlight);
+    box-shadow: 0 0 0 3px var(--shadow-highlight);
+  }
 }
 
 select::-ms-expand {
@@ -4202,6 +4269,17 @@ footer {
     min-width: $minWidth - $sidebarWidth;
   }
 
+  @include desktop {
+    @include bidi-style(
+      left,
+      $desktopSidebarWidth + $navigationWidth,
+      right,
+      0
+    );
+
+    min-width: $minWidth - $desktopSidebarWidth;
+  }
+
   &.no-sidebar {
     @include bidi-style(left, $navigationWidth, right, 0);
 
@@ -4230,6 +4308,10 @@ footer {
   @include phone {
     flex-direction: column;
     align-items: flex-end;
+  }
+
+  .form-group.tree_select {
+    overflow: visible;
   }
 }
 
@@ -5830,7 +5912,7 @@ a.list-group-item.active > .badge,
 }
 
 .popover {
-  @extend .zIndex-7;
+  @extend .zIndex-12;
 
   position: absolute;
   font-family: inherit;
@@ -7795,6 +7877,10 @@ a.list-group-item.active > .badge,
   transition: margin-right 500ms;
 
   @include rtl(transition, margin-left 500ms);
+
+  @include desktop {
+    @include bidi-style(margin-right, $desktopSidebarWidth, margin-left, 0);
+  }
 }
 
 .tabsSidebar-sidebarSpacer.is-closed {
@@ -7816,6 +7902,10 @@ a.list-group-item.active > .badge,
   border-left: 1px solid var(--border);
   padding: 0;
   margin-bottom: 1px;
+
+  @include desktop {
+    width: $desktopSidebarWidth;
+  }
 }
 
 .tabsSidebar .sidebar > hr {
@@ -7912,6 +8002,12 @@ a.list-group-item.active > .badge,
   transform: translateX($sidebarWidth);
 
   @include rtl(transform, translateX(-$sidebarWidth));
+
+  @include desktop {
+    transform: translateX($desktopSidebarWidth);
+
+    @include rtl(transform, translateX(-$desktopSidebarWidth));
+  }
 }
 
 .tabsSidebar-tabs {
@@ -8546,7 +8642,8 @@ li.list-item-none {
 }
 
 .token {
-  padding: 0 0 0 10px;
+  @include ltr(padding, 0 0 0 10px);
+
   margin: 0 5px 6px 0;
   height: 26px;
   color: var(--tag-text);
@@ -8602,6 +8699,9 @@ li.list-item-none {
 
 .token-label {
   padding: 0;
+
+  @include rtl(padding, 0 10px 0 0);
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -9270,10 +9370,6 @@ li.dropdown-header {
 
   display: flex;
 
-  &:not(:hover, .is-active) {
-    background: hsl(206, 7%, 28%);
-  }
-
   .icon {
     fill: var(--text-inverted);
 
@@ -9402,12 +9498,18 @@ li.dropdown-header {
   background: hsl(147, 52%, 43%);
 }
 
-.recipientList-controls,
-.recipientList-controls:hover {
+.recipientList-controls {
   @extend .u-clickable;
 
   padding: 0 10px !important;
-  background: var(--background-modifier-lighter);
+
+  .dropdown &:hover {
+    background: var(--supergood-color);
+
+    .icon-arrow-left {
+      fill: var(--text-inverted);
+    }
+  }
 
   & + li {
     box-shadow: 0 1px rgba(255, 255, 255, 0.13) inset;
@@ -9853,6 +9955,11 @@ li.dropdown-header {
 
   &.wizard-slide--large {
     width: 460px;
+  }
+
+  &.wizard-slide--very-large {
+    width: auto;
+    max-width: 990px;
   }
 }
 
@@ -10574,6 +10681,19 @@ label + .wizard-buttonList {
   &--with-switch {
     margin-bottom: 10px;
   }
+
+  .alert {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .alert + .horizontal-filter {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .alert + .horizontal-filter:last-child {
+    border-radius: 4px;
+  }
 }
 
 .horizontal-filter {
@@ -11281,6 +11401,10 @@ output {
   .settings-list--bottom-button {
     margin-top: 10px;
   }
+
+  .settings-list-middle {
+    vertical-align: middle;
+  }
 }
 
 .settings-list--roles-permissions {
@@ -11391,6 +11515,12 @@ output {
     position: relative;
     line-height: 19px;
 
+    &--with-clear-button {
+      padding-right: 60px;
+
+      @include bidi-style(padding-right, 60px, padding-left, 12px);
+    }
+
     &.form-control--small ~ .searchableSelect-autocomplete {
       top: 6px;
       left: 9px;
@@ -11399,7 +11529,8 @@ output {
 
   .searchableSelect-shadow {
     position: absolute;
-    left: -9999px;
+
+    @include bidi-style(left, -9999px, right, -9999px);
   }
 
   .dropdown-menu {
@@ -11419,15 +11550,48 @@ output {
     }
 
     &.is-inactive {
-      opacity: 0.73;
-      text-decoration: line-through;
-      pointer-events: none;
+      opacity: 0.33;
+      cursor: not-allowed;
     }
   }
 
   &.dropdown li {
-    &:hover:not(.is-active) {
+    &.has-inactive {
+      cursor: unset;
+    }
+
+    &.is-selected {
+      @include bidi-style(
+        border-left,
+        5px solid var(--highlight),
+        border-right,
+        5px solid var(--highlight)
+      );
+    }
+
+    &.js-enter:hover,
+    &.js-enter.is-active {
       background: none;
+
+      + li {
+        box-shadow: 0 1px rgba(255, 255, 255, 0.13) inset;
+      }
+    }
+
+    &.js-enter.is-highlighted {
+      span.searchableSelect-option-text {
+        background: var(--highlight);
+      }
+    }
+
+    &.js-back:hover,
+    &.js-back.is-active {
+      background: var(--supergood-color);
+
+      .icon-arrow-left,
+      .icon-arrow-right {
+        opacity: 1;
+      }
     }
 
     &.is-hidden {
@@ -11443,6 +11607,23 @@ output {
 
       span.searchableSelect-option-arrow {
         padding: 11px 15px;
+        cursor: pointer;
+
+        &:hover {
+          background: var(--supergood-color);
+
+          .recipientList-arrow {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    span.searchableSelect-option-text {
+      letter-spacing: -0.02rem;
+
+      &:hover {
+        background: var(--highlight);
       }
     }
   }

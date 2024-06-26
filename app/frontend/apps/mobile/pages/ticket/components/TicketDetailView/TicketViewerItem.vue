@@ -1,8 +1,8 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { AvatarUser } from '#shared/components/CommonUserAvatar/index.ts'
+import type { AvatarUser } from '#shared/components/CommonUserAvatar/types.ts'
 import CommonUserAvatar from '#shared/components/CommonUserAvatar/CommonUserAvatar.vue'
 import { EnumTaskbarApp } from '#shared/graphql/types.ts'
 
@@ -25,7 +25,7 @@ const idleClasses = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between pb-4 last:pb-0">
+  <div class="flex items-center justify-between px-3 first:pt-1 last:pb-1">
     <div class="flex items-center">
       <CommonUserAvatar :entity="user" :class="idleClasses" />
       <div class="ltr:ml-3 rtl:mr-3">{{ user.fullname }}</div>

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Integration::SMIMEController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
@@ -7,7 +7,7 @@ class Integration::SMIMEController < ApplicationController
     cert = SMIMECertificate.find(params[:id])
 
     send_data(
-      cert.raw,
+      cert.pem,
       filename:    "#{cert.subject_hash}.crt",
       type:        'text/plain',
       disposition: 'attachment'
@@ -44,7 +44,7 @@ class Integration::SMIMEController < ApplicationController
       string = params[:file].read.force_encoding('utf-8')
     end
 
-    cert = SecureMailing::SMIME::Certificate.parse(string)
+    cert = Certificate::X509::SMIME.parse(string)
     cert.valid_smime_certificate!
 
     items = SMIMECertificate.create_certificates(string)

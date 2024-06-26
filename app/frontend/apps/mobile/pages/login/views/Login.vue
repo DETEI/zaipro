@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
@@ -58,7 +58,6 @@ const { forceDesktop } = useForceDesktop()
 const { twoFactorPlugins, twoFactorMethods } = useTwoFactorPlugins()
 
 const finishLogin = () => {
-  // TODO: maybe we need some additional logic for the ThirtParty-Login situtation.
   const { redirect: redirectUrl } = route.query
   if (typeof redirectUrl === 'string') {
     router.replace(redirectUrl)

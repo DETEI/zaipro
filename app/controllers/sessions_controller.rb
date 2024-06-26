@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class SessionsController < ApplicationController
   prepend_before_action :authenticate_and_authorize!, only: %i[switch_to_user list delete]
@@ -302,6 +302,10 @@ class SessionsController < ApplicationController
     # https://github.com/zammad/zammad/issues/4263
     config['auth_saml_display_name'] = Setting.get('auth_saml_credentials')[:display_name]
 
+    # Include the flag for JSON column type support (currently only on PostgreSQL backend).
+    config['column_type_json_supported'] =
+      ActiveRecord::Base.connection_db_config.configuration_hash[:adapter] == 'postgresql'
+
     # Announce searchable models to the front end.
     config['models_searchable'] = Models.searchable.map(&:to_s)
 
@@ -314,6 +318,8 @@ class SessionsController < ApplicationController
     if current_user
       config['session_id'] = session.id.public_id
     end
+
+    config['core_workflow_config'] = CoreWorkflow.config
 
     config
   end

@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 /* eslint-disable security/detect-non-literal-fs-filename */
 
 import { createRequire } from 'module'
@@ -119,12 +119,6 @@ export default defineConfig(({ mode, command }) => {
       css: false,
       testTimeout: process.env.CI ? 30_000 : 5_000,
       unstubGlobals: true,
-      server: {
-        deps: {
-          // TODO remove after https://github.com/ueberdosis/tiptap/pull/3521 is merged
-          inline: ['@tiptap/extension-mention'],
-        },
-      },
       onConsoleLog(log) {
         if (log.includes('Not implemented: navigation')) return false
       },

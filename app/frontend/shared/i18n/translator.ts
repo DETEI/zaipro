@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 export type TranslationMap = Map<string, string>
 
@@ -11,7 +11,7 @@ export class Translator {
 
   translate(
     source: string,
-    ...args: Array<number | string | undefined | null>
+    ...args: Array<number | string | undefined | null | boolean>
   ): string {
     let target = this.translationMap.get(source) || source
 

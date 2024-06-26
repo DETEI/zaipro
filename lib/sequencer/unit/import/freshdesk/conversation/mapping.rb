@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::Unit::Import::Freshdesk::Conversation::Mapping < Sequencer::Unit::Base
   include ::Sequencer::Unit::Import::Common::Mapping::Mixin::ProvideMapped
@@ -31,7 +31,7 @@ class Sequencer::Unit::Import::Freshdesk::Conversation::Mapping < Sequencer::Uni
     }.freeze
   end
 
-  def process # rubocop:disable Metrics/AbcSize
+  def process
     provide_mapped do
       {
         from:          resource['from_email'],

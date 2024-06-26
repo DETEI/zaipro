@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { Ref } from 'vue'
 import type { ApolloError, OperationVariables } from '@apollo/client/core'
@@ -32,7 +32,7 @@ export default abstract class BaseHandler<
 
   protected baseHandlerOptions: BaseHandlerOptions = {
     errorShowNotification: true,
-    errorNotificationMessage: __('An error occured during the operation.'),
+    errorNotificationMessage: '',
     errorNotificationType: NotificationTypes.Error,
   }
 
@@ -113,7 +113,7 @@ export default abstract class BaseHandler<
       //   console.error(error)
       // }
       useNotifications().notify({
-        message: options.errorNotificationMessage,
+        message: this.errorNotificationMessage(errorHandler.message),
         type: options.errorNotificationType,
       })
     }
@@ -127,5 +127,17 @@ export default abstract class BaseHandler<
       this.baseHandlerOptions,
       handlerOptions,
     ) as CommonHandlerOptions<THandlerOptions>
+  }
+
+  private errorNotificationMessage(errorMessage?: string): string {
+    const defaultErrorNotificationMessage = __(
+      'An error occured during the operation.',
+    )
+
+    return (
+      this.handlerOptions.errorNotificationMessage ||
+      errorMessage ||
+      defaultErrorNotificationMessage
+    )
   }
 }

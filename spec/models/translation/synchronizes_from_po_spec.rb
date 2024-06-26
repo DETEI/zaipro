@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -219,7 +219,7 @@ RSpec.describe Translation, 'synchronizes_from_po' do
 
       CUSTOM_PO
 
-      described_class.all.delete_all
+      described_class.delete_all
       described_class.sync
     end
 

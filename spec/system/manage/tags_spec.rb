@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -21,7 +21,7 @@ RSpec.describe 'Manage > Tags', type: :system do
     end
 
     in_modal do
-      click_on 'Yes'
+      click_button 'Yes'
     end
 
     expect(page).to have_no_css('.modal')

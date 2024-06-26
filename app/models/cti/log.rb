@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Cti
   class Log < ApplicationModel
@@ -504,6 +504,10 @@ optional you can put the max oldest chat entries as argument
       }
 
       super.merge(virtual_attributes)
+    end
+
+    def attribute_names_for_serialization
+      super + %w[from_pretty to_pretty]
     end
 
     def set_pretty

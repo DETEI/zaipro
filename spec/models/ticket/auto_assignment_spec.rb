@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -16,7 +16,7 @@ RSpec.describe 'Ticket: #auto_assign' do # rubocop:disable RSpec/DescribeClass
       let(:agent)  { create(:agent, groups: [Group.first]) }
 
       context 'when the condition does match' do
-        let(:ticket_auto_assignment_condition) { { 'ticket.state_id' => { operator: 'is', value: Ticket::State.all.pluck(:id) } } }
+        let(:ticket_auto_assignment_condition) { { 'ticket.state_id' => { operator: 'is', value: Ticket::State.pluck(:id) } } }
 
         it 'does auto assign' do
           ticket.auto_assign(agent)

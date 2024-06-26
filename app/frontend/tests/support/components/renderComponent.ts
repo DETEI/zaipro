@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { Plugin, Ref } from 'vue'
 import { isRef, nextTick, ref, watchEffect, unref } from 'vue'
@@ -154,6 +154,7 @@ const initializeRouter = (routes?: RouteRecordRaw[]) => {
   }
 
   router = createRouter({
+    // TODO should use the app.
     history: createWebHistory('/mobile'),
     routes: localRoutes,
   }) as MockedRouter
@@ -365,7 +366,7 @@ const renderComponent = <Props>(
   if (wrapperOptions?.form && wrapperOptions?.formField) {
     defaultWrapperOptions.props ||= {}
 
-    // Reset the defult of 20ms for testing.
+    // Reset the default of 20ms for testing.
     defaultWrapperOptions.props.delay = 0
   }
 
@@ -384,10 +385,9 @@ const renderComponent = <Props>(
 
   const events = userEvent.setup({
     advanceTimers(delay) {
-      try {
+      if (vi.isFakeTimers()) {
         vi.advanceTimersByTime(delay)
-        // eslint-disable-next-line no-empty
-      } catch {}
+      }
     },
   })
 

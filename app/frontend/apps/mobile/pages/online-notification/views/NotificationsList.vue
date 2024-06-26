@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -41,7 +41,7 @@ const seenNotification = (id: Scalars['ID']['output']) => {
     }),
     {
       errorNotificationMessage: __(
-        'The online notifcation could not be marked as seen.',
+        'The online notification could not be marked as seen.',
       ),
     },
   )

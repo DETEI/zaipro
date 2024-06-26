@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 <script setup lang="ts">
 import { toRef, computed, ref } from 'vue'
 import type { FormFieldContext } from '#shared/components/Form/types/field.ts'
@@ -12,8 +12,6 @@ import type { FileUploaded } from '#shared/components/Form/fields/FieldFile/type
 import { useFormUploadCacheAddMutation } from './graphql/mutations/uploadCache/add.api.ts'
 import { useFormUploadCacheRemoveMutation } from './graphql/mutations/uploadCache/remove.api.ts'
 import type { FieldFileProps } from './types.ts'
-
-// TODO: Add a test + story for this component.
 
 export interface Props {
   context: FormFieldContext<FieldFileProps>
@@ -68,10 +66,14 @@ const loadFiles = async (files: FileList | File[]) => {
 
   const uploads = await convertFileList(files)
 
-  const data = await addFileMutation.send({
-    formId: props.context.formId,
-    files: uploads,
-  })
+  const data = await addFileMutation
+    .send({
+      formId: props.context.formId,
+      files: uploads,
+    })
+    .catch(() => {
+      reset()
+    })
 
   const uploadedFiles = data?.formUploadCacheAdd?.uploadedFiles
 

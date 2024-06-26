@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Queries
   class Translations < BaseQueryWithPayload
@@ -33,7 +33,7 @@ module Gql::Queries
       {
         is_cache_still_valid: false,
         cache_key:            new_cache_key,
-        translations:         base_query.all.pluck(:source, :target).to_h
+        translations:         base_query.pluck(:source, :target).to_h
       }
     end
 

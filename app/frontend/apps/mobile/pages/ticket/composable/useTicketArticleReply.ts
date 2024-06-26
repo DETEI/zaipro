@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { FormRef } from '#shared/components/Form/types.ts'
 import { useDialog } from '#shared/composables/useDialog.ts'
@@ -71,12 +71,12 @@ export const useTicketArticleReply = (
     return true
   }
 
-  const openArticleReplyDialog = ({
+  const openArticleReplyDialog = async ({
     updateFormLocation,
   }: ReplyDialogOptions) => {
     if (!ticket.value) return
 
-    articleReplyDialog.open({
+    return articleReplyDialog.open({
       name: articleReplyDialog.name,
       ticket,
       form,

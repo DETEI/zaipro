@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'browser_test_helper'
 
@@ -17,7 +17,7 @@ class CustomerTicketCreateTest < TestCase
     sleep 2
 
     select(
-      css:   '.newTicket select[name="group_id"]',
+      css:   '.newTicket input[name="group_id"]',
       value: 'Users',
     )
 
@@ -180,7 +180,7 @@ class CustomerTicketCreateTest < TestCase
     sleep 2
 
     select(
-      css:   '.newTicket select[name="group_id"]',
+      css:   '.newTicket input[name="group_id"]',
       value: 'Users',
     )
 

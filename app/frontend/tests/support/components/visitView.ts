@@ -1,11 +1,14 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { useApolloClient } from '@vue/apollo-composable'
 import { random } from 'lodash-es'
 import type { RouteRecordRaw } from 'vue-router'
 import LayoutTest from './LayoutTest.vue'
 import mockApolloClient from '../mock-apollo-client.ts'
-import renderComponent, { getTestRouter } from './renderComponent.ts'
+import renderComponent, {
+  getTestRouter,
+  type ExtendedMountingOptions,
+} from './renderComponent.ts'
 
 vi.mock('#shared/server/apollo/client.ts', () => {
   return {
@@ -32,10 +35,19 @@ Object.defineProperty(window, 'fetch', {
 
 const html = String.raw
 
-export const visitView = async (href: string) => {
+interface VisitViewOptions extends ExtendedMountingOptions<unknown> {
+  mockApollo?: boolean
+}
+
+export const visitView = async (
+  href: string,
+  options: VisitViewOptions = { mockApollo: true },
+) => {
   const { routes } = await import('#mobile/router/index.ts')
 
-  mockApolloClient([])
+  if (options.mockApollo) {
+    mockApolloClient([])
+  }
 
   // remove LayoutMain layout, keep only actual content
   if (routes.at(-1)?.name === 'Main') {
@@ -65,6 +77,7 @@ export const visitView = async (href: string) => {
       propsData: {
         testKey,
       },
+      ...options,
     },
   )
 

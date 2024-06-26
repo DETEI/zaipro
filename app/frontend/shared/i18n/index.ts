@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { reactive } from 'vue'
 import { useReactiveNow } from '#shared/composables/useReactiveNow.ts'
@@ -13,7 +13,7 @@ export class I18N {
 
   t(
     source: string | undefined,
-    ...args: Array<string | number | undefined | null>
+    ...args: Array<string | number | undefined | null | boolean>
   ): string {
     if (typeof source === 'undefined') return ''
 

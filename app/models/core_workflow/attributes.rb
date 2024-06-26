@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'digest/md5'
 
@@ -248,7 +248,7 @@ class CoreWorkflow::Attributes
   end
 
   def attribute_options_relation?(attribute)
-    attribute[:tag] == 'select' && attribute[:relation].present?
+    %w[select tree_select].include?(attribute[:tag]) && attribute[:relation].present?
   end
 
   def values(attribute)

@@ -1,9 +1,15 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Integration::LdapController < ApplicationController
   include Integration::ImportJobBase
 
   prepend_before_action :authenticate_and_authorize!
+
+  EXCEPTIONS_SPECIAL_TREATMENT = {
+    '48, Inappropriate Authentication' => {}, # workaround for issue #1114
+    '50, Insufficient Access Rights'   => { error: 'disallow-bind-anon' },
+    '53, Unwilling to perform'         => { error: 'disallow-bind-anon' },
+  }.freeze
 
   def discover
     answer_with do
@@ -14,12 +20,7 @@ class Integration::LdapController < ApplicationController
         attributes: ldap.preferences
       }
     rescue => e
-      # workaround for issue #1114
-      raise if !e.message.end_with?(', 48, Inappropriate Authentication')
-
-      # return empty result
-      {}
-
+      EXCEPTIONS_SPECIAL_TREATMENT.find { |msg, _| e.message.ends_with?(msg) }&.last || raise
     end
   end
 

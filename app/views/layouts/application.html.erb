@@ -4,9 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="csrf-token" content="<%= csrf_meta_tags %>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
   <title><%= Setting.get('product_name') %></title>
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <%= stylesheet_link_tag "application", :media => 'all' %>
@@ -43,24 +40,8 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <% if User.find(UserInfo.current_user_id).permissions?('admin') %>
-    <%= link_to 'Feedbacks', feedbacks_path, class: 'feedback_link btn btn-secondary' %>
-  <% end -%>
+
   <%= content_for?(:content) ? yield(:content) : yield %>
-  
-    <script type="text/javascript">
-      document.addEventListener('DOMContentLoaded', function() {
-          var path = window.location.pathname;
-          if (path === '/' || path === '/home') {
-              document.querySelectorAll('.feedback_link').forEach(function(link) {
-                  link.style.display = 'block';
-              });
-          } else {
-              document.querySelectorAll('.feedback_link').forEach(function(link) {
-                  link.style.display = 'none';
-              });
-          }
-      });
-  </script>
+
 </body>
 </html>

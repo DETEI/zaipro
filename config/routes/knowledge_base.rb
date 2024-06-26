@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 Zammad::Application.routes.draw do
 
@@ -23,6 +23,8 @@ Zammad::Application.routes.draw do
         get  :visible_ids
         post :search,         controller: 'knowledge_base/search'
         get  :recent_answers, controller: 'knowledge_base/answers'
+
+        get 'preview/:object/:id/:locale', to: 'knowledge_bases#preview'
 
         resources :manage, controller: 'knowledge_base/manage' do
           collection do

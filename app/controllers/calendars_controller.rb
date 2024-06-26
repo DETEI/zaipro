@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class CalendarsController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
@@ -6,7 +6,7 @@ class CalendarsController < ApplicationController
   def init
     assets = {}
     record_ids = []
-    Calendar.all.reorder(:name, :created_at).each do |calendar|
+    Calendar.reorder(:name, :created_at).each do |calendar|
       record_ids.push calendar.id
       assets = calendar.assets(assets)
     end

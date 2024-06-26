@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Tasks
   module Zammad
@@ -50,7 +50,7 @@ module Tasks
           abort "Error: wrong number of arguments given.\n#{usage}"
         end
         # Rake will try to run additional arguments as tasks, so make sure nothing happens for these.
-        args[1..].each { |a| Rake::Task.define_task(a.to_sym => :environment) do; end } # rubocop:disable Style/BlockDelimiters
+        args[1..].each { |a| Rake::Task.define_task(a.to_sym => :environment) {} }  # rubocop:disable Lint/EmptyBlock
       end
     end
   end

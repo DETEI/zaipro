@@ -1,11 +1,11 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Auth::TwoFactor
 
   attr_reader :user, :all_authentication_methods
 
   def self.authentication_method_classes
-    @authentication_method_classes ||= Auth::TwoFactor::AuthenticationMethod.descendants
+    @authentication_method_classes ||= Auth::TwoFactor::AuthenticationMethod.descendants.sort_by(&:name)
   end
 
   def initialize(user)

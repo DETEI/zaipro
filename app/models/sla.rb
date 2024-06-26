@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sla < ApplicationModel
   include ChecksClientNotification
@@ -10,6 +10,8 @@ class Sla < ApplicationModel
 
   # workflow checks should run after before_create and before_update callbacks
   include ChecksCoreWorkflow
+
+  core_workflow_screens 'create', 'edit'
 
   validates  :name, presence: true
 

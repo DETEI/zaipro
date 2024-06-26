@@ -1,7 +1,8 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
-import type { PopupItemDescriptor } from '#mobile/components/CommonSectionPopup/index.ts'
+import type { PopupItemDescriptor } from '#mobile/components/CommonSectionPopup/types.ts'
 import { useDialog } from '#shared/composables/useDialog.ts'
+import log from '#shared/utils/log.ts'
 import { computed, nextTick, ref, shallowRef } from 'vue'
 import type {
   TicketArticle,
@@ -147,7 +148,6 @@ export const useTicketArticleContext = () => {
       // setting it to "false" is done via "update:modelValue"
       if (!value) {
         articleForContext.value = undefined
-        // TODO: add tests, when we have an action that uses it
         disposeCallbacks.forEach((callback) => callback())
         disposeCallbacks.length = 0
       }
@@ -161,7 +161,8 @@ export const useTicketArticleContext = () => {
     try {
       // can throw RangeError
       selectionData.value = getArticleSelection(article.internalId)
-    } catch {
+    } catch (err) {
+      log.error('[Article Quote] Failed to parse article selection', err)
       selectionData.value = undefined
     }
   }

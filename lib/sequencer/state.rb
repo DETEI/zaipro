@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::State
   include ::Mixin::RailsLogger
@@ -158,7 +158,7 @@ class Sequencer::State
   #
   # @example
   #  state.to_h
-  #  #=> {"ssl_verify"=>true, "host_url"=>"ldaps://192...", ...}
+  #  #=> {"ssl_verify"=>true, "host"=>"192...", ...}
   #
   # @return [Hash{Symbol => Object}]
   def to_h

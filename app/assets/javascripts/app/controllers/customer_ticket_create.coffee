@@ -22,7 +22,16 @@ class CustomerTicketCreate extends App.ControllerAppContent
     @form_id = App.ControllerForm.formId()
 
     @navupdate '#customer_ticket_new'
-    @render()
+
+    @ajax(
+      type: 'GET'
+      url:  "#{@apiPath}/ticket_create"
+      processData: true
+      success: (data, status, xhr) =>
+        App.Collection.loadAssets(data.assets)
+        @formMeta = data.form_meta
+        @render()
+    )
 
   show: =>
 
@@ -60,6 +69,7 @@ class CustomerTicketCreate extends App.ControllerAppContent
       model:                   App.Ticket
       screen:                  'create_middle'
       mixedAttributes:         Object.assign({}, pre_top, top, article_top, middle, bottom)
+      formMeta:                @formMeta
       params:                  defaults
       noFieldset:              true
       handlersConfig:          handlers
@@ -68,6 +78,7 @@ class CustomerTicketCreate extends App.ControllerAppContent
       events:
         'fileUploadStart .richtext': => @submitDisable()
         'fileUploadStop .richtext': => @submitEnable()
+      articleParamsCallback: @articleParams
     )
 
     @$('[name="group_id"], [name="organization_id"]').bind('change', =>
@@ -85,6 +96,26 @@ class CustomerTicketCreate extends App.ControllerAppContent
 
   params: =>
     params = @formParam(@$('.main form'))
+
+  articleParams: =>
+    params = @params()
+    if params.group_id
+      group = App.Group.find( params.group_id )
+
+    # find sender_id
+    sender = App.TicketArticleSender.findByAttribute( 'name', 'Customer' )
+    type   = App.TicketArticleType.findByAttribute( 'name', 'web' )
+
+    {
+      from:         "#{ @Session.get().displayName() }"
+      to:           (group && group.name) || ''
+      subject:      params.subject
+      body:         params.body
+      type_id:      type.id
+      sender_id:    sender.id
+      form_id:      @form_id
+      content_type: 'text/html'
+    }
 
   submit: (e) ->
     e.preventDefault()
@@ -108,23 +139,8 @@ class CustomerTicketCreate extends App.ControllerAppContent
     ticket = new App.Ticket
     @log 'CustomerTicketCreate', 'notice', 'updateAttributes', params
 
-    # find sender_id
-    sender = App.TicketArticleSender.findByAttribute( 'name', 'Customer' )
-    type   = App.TicketArticleType.findByAttribute( 'name', 'web' )
-    if params.group_id
-      group = App.Group.find( params.group_id )
-
     # create article
-    params['article'] = {
-      from:         "#{ @Session.get().displayName() }"
-      to:           (group && group.name) || ''
-      subject:      params.subject
-      body:         params.body
-      type_id:      type.id
-      sender_id:    sender.id
-      form_id:      @form_id
-      content_type: 'text/html'
-    }
+    params['article'] = @articleParams()
 
     ticket.load(params)
 

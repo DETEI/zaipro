@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Chat::Session
   module Search
@@ -80,7 +80,7 @@ returns
         # - stip out * we already search for *query* -
         query.delete! '*'
         Chat::Session.where(
-          'name LIKE ?', "%#{query}%"
+          'name LIKE ?', "%#{SqlHelper.quote_like(query)}%"
         ).reorder('name').offset(offset).limit(limit).to_a
 
       end

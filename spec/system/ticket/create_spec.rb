@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -13,13 +13,13 @@ RSpec.describe 'Ticket Create', type: :system do
       it 'login screen after certain create was called', authenticated_as: false do
         visit '#ticket/create/id/1234'
 
-        expect(page).to have_selector('#login')
+        expect(page).to have_css('#login')
       end
 
       it 'login screen after generic create was called', authenticated_as: false do
         visit '#ticket/create'
 
-        expect(page).to have_selector('#login')
+        expect(page).to have_css('#login')
       end
     end
   end
@@ -257,7 +257,7 @@ RSpec.describe 'Ticket Create', type: :system do
       browser_travel_to Time.current
 
       visit 'ticket/create'
-      use_template template
+      use_template template, without_taskbar: true
     end
 
     let(:field_date) { find 'input[name="{date}date_test"]', visible: :all }
@@ -329,9 +329,9 @@ RSpec.describe 'Ticket Create', type: :system do
         click('.sidebar-header-headline.js-headline')
 
         # add issue
-        click_on 'Link issue'
+        click_link 'Link issue'
         fill_in 'link', with: ENV['GITLAB_ISSUE_LINK']
-        click_on 'Submit'
+        click_button 'Submit'
 
         # verify issue
         content = find('.sidebar-git-issue-content')
@@ -374,9 +374,9 @@ RSpec.describe 'Ticket Create', type: :system do
         click('.sidebar-header-headline.js-headline')
 
         # add issue
-        click_on 'Link issue'
+        click_link 'Link issue'
         fill_in 'link', with: ENV['GITHUB_ISSUE_LINK']
-        click_on 'Submit'
+        click_button 'Submit'
 
         # verify issue
         content = find('.sidebar-git-issue-content')
@@ -501,20 +501,20 @@ RSpec.describe 'Ticket Create', type: :system do
     let(:agent)    { create(:agent, password: 'test') }
     let(:customer) { create(:customer, password: 'test') }
 
-    it 'customer user should not have agent object attributes', authenticated_as: :agent do
-      # Log out again, so that we can execute the next login.
-      logout
+    it 'customer user should not have agent object attributes', authenticated_as: false do
 
-      # Re-create agent session and fetch object attributes.
+      # Create agent session and fetch object attributes.
       login(
         username: agent.login,
         password: 'test'
       )
       visit 'ticket/create'
 
-      # Re-remove local object attributes bound to the session
-      # there was an issue (#1856) where the old attribute values
-      # persisted and were stored as the original attributes.
+      expect(page).to have_field('customer_id', type: 'hidden')
+
+      # Remove local object attributes bound to the session.
+      #   There was an issue (#1856) where the old attribute values
+      #   persisted and were stored as the original attributes.
       logout
 
       # Create customer session and fetch object attributes.
@@ -522,10 +522,9 @@ RSpec.describe 'Ticket Create', type: :system do
         username: customer.login,
         password: 'test'
       )
-
       visit 'customer_ticket_new'
 
-      expect(page).to have_no_css('.newTicket input[name="customer_id"]')
+      expect(page).to have_no_field('customer_id', type: 'hidden')
     end
   end
 
@@ -868,7 +867,7 @@ RSpec.describe 'Ticket Create', type: :system do
     end
 
     it 'does not show double signature on template usage' do
-      select Group.first.name, from: 'group_id'
+      set_tree_select_value('group_id', Group.first.name)
       use_template(template)
       expect(page).to have_no_text('Test Other Agent')
     end
@@ -948,7 +947,7 @@ RSpec.describe 'Ticket Create', type: :system do
       it 'can create tickets for secondary organizations' do
         fill_in 'Title', with: 'test'
         find('.richtext-content').send_keys 'test'
-        select Group.first.name, from: 'group_id'
+        set_tree_select_value('group_id', Group.first.name)
 
         find('[name=customer_id_completion]').fill_in with: user1.firstname
         wait.until { page.all("li.recipientList-entry.js-object[data-object-id='#{user1.id}']").present? }
@@ -979,7 +978,7 @@ RSpec.describe 'Ticket Create', type: :system do
       it 'can create tickets for secondary organizations', authenticated_as: :customer1 do
         fill_in 'Title', with: 'test'
         find('.richtext-content').send_keys 'test'
-        select Group.first.name, from: 'group_id'
+        set_tree_select_value('group_id', Group.first.name)
         find('div[data-attribute-name=organization_id] .js-input').fill_in with: customer1.organizations[0].name, fill_options: { clear: :backspace }
         wait.until { page.all("div[data-attribute-name=organization_id] .js-option[data-value='#{customer1.organizations[0].id}']").present? }
         page.find("div[data-attribute-name=organization_id] .js-option[data-value='#{customer1.organizations[0].id}'] span").click
@@ -1031,7 +1030,11 @@ RSpec.describe 'Ticket Create', type: :system do
     end
 
     it 'preserves text input from the user' do
+      taskbar_timestamp = Taskbar.last.updated_at
+
       set_editor_field_value('body', 'foobar')
+
+      wait.until { Taskbar.last.updated_at != taskbar_timestamp }
 
       use_template(template1)
       check_input_field_value('title', 'template 1')
@@ -1047,7 +1050,11 @@ RSpec.describe 'Ticket Create', type: :system do
       check_input_field_value('title', 'template 2')
       check_editor_field_value('body', 'body 2')
 
+      taskbar_timestamp = Taskbar.last.updated_at
+
       set_editor_field_value('body', 'foobar')
+
+      wait.until { Taskbar.last.updated_at != taskbar_timestamp }
 
       # This time body value should be left as-is
       use_template(template1)
@@ -1063,7 +1070,7 @@ RSpec.describe 'Ticket Create', type: :system do
       shared_examples 'calculated datetime value' do
 
         it 'applies correct datetime value' do
-          use_template(template)
+          use_template(template, without_taskbar: true)
 
           check_date_field_value(field, date.strftime('%m/%d/%Y'))
           check_time_field_value(field, date.strftime('%H:%M'))
@@ -1118,7 +1125,7 @@ RSpec.describe 'Ticket Create', type: :system do
       let(:template_value) { date.to_datetime.to_s }
 
       it 'applies correct date value' do
-        use_template(template)
+        use_template(template, without_taskbar: true)
 
         check_date_field_value(field, date.strftime('%m/%d/%Y'))
       end
@@ -1212,7 +1219,7 @@ RSpec.describe 'Ticket Create', type: :system do
     end
 
     it 'filters active templates only' do
-      expect(find('#form-template select[name="id"]')).to have_selector('option', text: active_template.name).and(have_no_selector('option', text: inactive_template.name))
+      expect(find('#form-template select[name="id"]')).to have_css('option', text: active_template.name).and(have_no_selector('option', text: inactive_template.name))
     end
   end
 
@@ -1256,8 +1263,6 @@ RSpec.describe 'Ticket Create', type: :system do
       it 'applies configured cc value' do
         use_template(template)
 
-        await_empty_ajax_queue
-
         expect(page).to have_css('label', text: 'CC')
 
         check_input_field_value('cc', cc_recipients, visible: :all)
@@ -1273,8 +1278,6 @@ RSpec.describe 'Ticket Create', type: :system do
 
       it 'ignores configured cc value' do
         use_template(template)
-
-        await_empty_ajax_queue
 
         expect(page).to have_no_css('label', text: 'CC')
 
@@ -1315,7 +1318,7 @@ RSpec.describe 'Ticket Create', type: :system do
 
           expect(elem)
             .to have_no_selector('.tabsSidebar-tab-count--danger')
-            .and have_selector('.tabsSidebar-tab-count--warning')
+            .and have_css('.tabsSidebar-tab-count--warning')
         end
       end
 
@@ -1324,7 +1327,7 @@ RSpec.describe 'Ticket Create', type: :system do
 
         it 'highlights as danger' do
           expect(elem)
-            .to have_selector('.tabsSidebar-tab-count--danger')
+            .to have_css('.tabsSidebar-tab-count--danger')
             .and have_no_selector('.tabsSidebar-tab-count--warning')
         end
       end
@@ -1388,9 +1391,9 @@ RSpec.describe 'Ticket Create', type: :system do
       multi_tree_select_click('Change request')
       select '1 low', from: 'priority_id'
       select 'pending reminder', from: 'state_id'
-      expect(page).to have_selector('span.token-label', text: 'Incident')
-      expect(page).to have_selector('span.token-label', text: 'Service request')
-      expect(page).to have_selector('span.token-label', text: 'Change request')
+      expect(page).to have_css('span.token-label', text: 'Incident')
+      expect(page).to have_css('span.token-label', text: 'Service request')
+      expect(page).to have_css('span.token-label', text: 'Change request')
     end
   end
 
@@ -1474,6 +1477,91 @@ RSpec.describe 'Ticket Create', type: :system do
     it 'does create a date with a relative template value' do
       click '.js-submit'
       expect(Ticket.last).to have_attributes(field_name => 1.day.from_now.to_date)
+    end
+  end
+
+  describe 'Setting a group via CoreWorkflow in the ticket creation mask does not update text module filters and email signatures #4891', authenticated_as: :authenticate do
+    let(:group_1) { create(:group, signature: create(:signature, body: SecureRandom.uuid)) }
+    let(:group_2) { create(:group, signature: create(:signature, body: SecureRandom.uuid)) }
+    let(:workflow_1) do
+      create(:core_workflow,
+             object:             'Ticket',
+             condition_selected: { 'ticket.priority_id'=>{ 'operator' => 'is', 'value' => Ticket::Priority.find_by(name: '3 high').id.to_s } },
+             perform:            { 'ticket.group_id' => { 'operator' => 'select', 'select' => group_1.id.to_s } })
+    end
+    let(:workflow_2) do
+      create(:core_workflow,
+             object:             'Ticket',
+             condition_selected: { 'ticket.priority_id'=>{ 'operator' => 'is', 'value' => Ticket::Priority.find_by(name: '1 low').id.to_s } },
+             perform:            { 'ticket.group_id' => { 'operator' => 'select', 'select' => group_2.id.to_s } })
+    end
+
+    def authenticate
+      workflow_1 && workflow_2
+      group_1 && group_2
+      create(:agent, groups: Group.all)
+    end
+
+    it 'does change the signature when switching group via core workflow' do
+      visit 'ticket/create'
+      find('[data-type=email-out]').click
+
+      page.find('[name=priority_id]').select '3 high'
+      expect(page).to have_text(group_1.signature.body)
+
+      page.find('[name=priority_id]').select '1 low'
+      expect(page).to have_text(group_2.signature.body)
+    end
+  end
+
+  describe 'CoreWorkflow "fill in empty" fires on non-empty fields during ticket creation when logged in as customer #5004' do
+    let(:body_content) { SecureRandom.uuid }
+    let(:workflow) do
+      create(:core_workflow,
+             object:  'Ticket',
+             perform: { 'article.body' => { 'operator' => 'fill_in_empty', 'fill_in_empty' => body_content } })
+    end
+
+    def setup_workflows
+      workflow
+    end
+
+    context 'when agent', authenticated_as: :authenticate do
+      def authenticate
+        setup_workflows
+        true
+      end
+
+      before do
+        visit '#ticket/create'
+      end
+
+      it 'does fill the body' do
+        check_editor_field_value('body', body_content)
+        set_editor_field_value('body', 'new_content')
+        check_editor_field_value('body', 'new_content')
+        page.find('[name=priority_id]').select '3 high'
+        check_editor_field_value('body', 'new_content')
+      end
+    end
+
+    context 'when customer', authenticated_as: :authenticate do
+      def authenticate
+        setup_workflows
+        create(:customer)
+      end
+
+      before do
+        visit 'customer_ticket_new'
+      end
+
+      it 'does fill the body' do
+        check_editor_field_value('body', body_content)
+        set_editor_field_value('body', 'new_content')
+        check_editor_field_value('body', 'new_content')
+        page.find('[name=state_id]').select 'closed'
+        check_editor_field_value('body', 'new_content')
+      end
     end
   end
 end

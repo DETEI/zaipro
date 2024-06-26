@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # encoding: utf-8
 
@@ -13,7 +13,6 @@ class Channel::EmailParser
   MESSAGE_STRUCT = Struct.new(:from_display_name, :subject, :msg_size).freeze
 
   UNPROCESSABLE_MAIL_DIRECTORY = Rails.root.join('var/spool/unprocessable_mail')
-  OVERSIZED_MAIL_DIRECTORY = Rails.root.join('var/spool/oversized_mail')
 
 =begin
 
@@ -520,14 +519,44 @@ process unprocessable_mails (var/spool/unprocessable_mail/*.eml) again
 
 =begin
 
-  process oversized emails by:
-  1. Archiving the oversized mail as tmp/oversized_mail/md5.eml
-  2. Reply with a postmaster message to inform the sender
+process unprocessable articles provided by the HTMLSanitizer.
+
+  Channel::EmailParser.process_unprocessable_articles
+
+=end
+
+  def self.process_unprocessable_articles(_params = {})
+    articles = Ticket::Article.where(body: ::HtmlSanitizer::UNPROCESSABLE_HTML_MSG)
+    articles.reorder(id: :desc).as_batches do |article|
+      if !article.as_raw&.content
+        puts "No raw content for article id #{article.id}! Please verify manually via command: Ticket::Article.find(#{article.id}).as_raw" # rubocop:disable Rails/Output
+        next
+      end
+
+      puts "Fix article #{article.id}..." # rubocop:disable Rails/Output
+
+      ApplicationHandleInfo.use('email_parser.postmaster') do
+        parsed = Channel::EmailParser.new.parse(article.as_raw.content)
+        if parsed[:body] == ::HtmlSanitizer::UNPROCESSABLE_HTML_MSG
+          puts "ERROR: Failed to reprocess the article, please verify the content of the article and if needed increase the timeout (see: Setting.get('html_sanitizer_processing_timeout'))." # rubocop:disable Rails/Output
+          next
+        end
+
+        article.update!(body: parsed[:body], content_type: parsed[:content_type])
+      end
+    end
+
+    puts "#{articles.count} articles are affected." # rubocop:disable Rails/Output
+  end
+
+=begin
+
+  process oversized emails by
+  - Reply with a postmaster message to inform the sender
 
 =end
 
   def process_oversized_mail(channel, msg)
-    archive_mail(OVERSIZED_MAIL_DIRECTORY, msg)
     postmaster_response(channel, msg)
   end
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
@@ -15,7 +15,7 @@ import {
 } from '#shared/graphql/types.ts'
 import { useSessionStore } from './session.ts'
 import { useApplicationStore } from './application.ts'
-import { resetAndDisposeStores } from '.'
+import { resetAndDisposeStores } from './index.ts'
 
 interface LoginOptions {
   login: string

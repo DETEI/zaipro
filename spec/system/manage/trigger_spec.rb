@@ -1,13 +1,13 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/examples/pagination_examples'
 
-RSpec.describe 'Manage > Trigger', mariadb: true, type: :system do
+RSpec.describe 'Manage > Trigger', type: :system do
 
   def open_new_trigger_dialog
     visit '/#manage/trigger'
-    click_on 'New Trigger'
+    click_link 'New Trigger'
   end
 
   context 'Selector' do

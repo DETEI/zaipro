@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import Form from '#shared/components/Form/Form.vue'
@@ -87,7 +87,6 @@ const loginSchema = defineFormSchema([
   },
 ])
 
-// TODO: workaround for disabled button state, will be changed in formkit.
 const { form, isDisabled } = useForm()
 
 const { clearAllNotifications } = useNotifications()

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class SecureMailing::PGP::Outgoing < SecureMailing::Backend::HandlerOutgoing
   def type
@@ -26,7 +26,7 @@ class SecureMailing::PGP::Outgoing < SecureMailing::Backend::HandlerOutgoing
     raise
   end
 
-  def self.encoded_body_part(data) # rubocop:disable Metrics/AbcSize
+  def self.encoded_body_part(data)
     Mail::Part.new do
       if data.multipart?
         if data.content_type =~ %r{(multipart[^;]+)}
@@ -157,7 +157,7 @@ class SecureMailing::PGP::Outgoing < SecureMailing::Backend::HandlerOutgoing
   def encrypted_body(data)
     SecureMailing::PGP::Tool.new.with_private_keyring do |pgp_tool|
       keys.each { |key| pgp_tool.import(key.key) }
-      encrypted_result = pgp_tool.encrypt(data, keys.map(&:email_addresses).flatten)
+      encrypted_result = pgp_tool.encrypt(data, keys.map(&:fingerprint))
 
       encrypted_result[:stdout]
     end

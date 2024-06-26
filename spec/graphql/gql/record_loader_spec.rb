@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -136,8 +136,8 @@ RSpec.describe Gql::RecordLoader, :aggregate_failures, authenticated_as: :agent,
           'ObjectLookup Load'      => 1,
           'Permission Load'        => 7,
           'Permission Exists?'     => 6,
-          'Group Load'             => 11,
-          'UserGroup Exists?'      => 4,
+          'Group Load'             => 1,
+          'UserGroup Exists?'      => 2,
           'Ticket Load'            => 1,
           # 'Ticket Exists?'         => 1,
           'User Load'              => 2,
@@ -154,8 +154,8 @@ RSpec.describe Gql::RecordLoader, :aggregate_failures, authenticated_as: :agent,
           'ObjectLookup Load'      => 1,
           'Permission Load'        => 6,
           'Permission Exists?'     => 6,
-          'Group Load'             => 3,
-          'UserGroup Exists?'      => 4,
+          'Group Load'             => 1,
+          'UserGroup Exists?'      => 2,
           'Ticket Load'            => 1,
           # 'Ticket Exists?'         => 1,
           'User Load'              => 2,

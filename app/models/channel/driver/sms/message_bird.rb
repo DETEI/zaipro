@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Channel::Driver::Sms::MessageBird < Channel::Driver::Sms::Base
   NAME = 'sms/message_bird'.freeze
@@ -92,7 +92,7 @@ class Channel::Driver::Sms::MessageBird < Channel::Driver::Sms::Base
         { name: 'options::webhook_token', display: __('Webhook Token'), tag: 'input', type: 'text', limit: 200, null: false, default: Digest::MD5.hexdigest(SecureRandom.uuid), disabled: true, readonly: true },
         { name: 'options::token', display: __('Token'), tag: 'input', type: 'text', limit: 255, null: false },
         { name: 'options::sender', display: __('Sender'), tag: 'input', type: 'text', limit: 200, null: false, placeholder: '+491710000000' },
-        { name: 'group_id', display: __('Destination Group'), tag: 'select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
+        { name: 'group_id', display: __('Destination Group'), tag: 'tree_select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
       ],
       notification: [
         { name: 'options::token', display: __('Token'), tag: 'input', type: 'text', limit: 255, null: false },

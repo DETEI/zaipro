@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module ChecksCoreWorkflow
   extend ActiveSupport::Concern
@@ -13,8 +13,15 @@ module ChecksCoreWorkflow
   private
 
   class_methods do
+
+    # defines the screens which core workflow executes
     def core_workflow_screens(*screens)
       @core_workflow_screens ||= screens
+    end
+
+    # defines the screens which are configurable via admin interface
+    def core_workflow_admin_screens(*screens)
+      @core_workflow_admin_screens ||= screens
     end
   end
 

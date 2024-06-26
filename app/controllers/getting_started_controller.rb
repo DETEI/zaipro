@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class GettingStartedController < ApplicationController
   prepend_before_action -> { authorize! }, only: [:base]
@@ -197,7 +197,7 @@ curl http://localhost/api/v1/getting_started -v -u #{login}:#{password}
 
   def setup_done
     # return false
-    count = User.all.count
+    count = User.count
     done = true
     if count <= 2
       done = false

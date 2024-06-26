@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -131,7 +131,7 @@ RSpec.describe 'Ticket zoom > Auto Assignment', type: :system do
 
     def authenticate
       Setting.set('ticket_auto_assignment', true)
-      Setting.set('ticket_auto_assignment_selector', { condition: { 'ticket.state_id' => { operator: 'is', value: Ticket::State.all.pluck(:id) } } })
+      Setting.set('ticket_auto_assignment_selector', { condition: { 'ticket.state_id' => { operator: 'is', value: Ticket::State.pluck(:id) } } })
       field
       true
     end

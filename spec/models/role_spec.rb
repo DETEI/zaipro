@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/application_model_examples'
@@ -198,6 +198,26 @@ RSpec.describe Role do
           expect { role.update(default_at_signup: true) }
             .to raise_error(Exceptions::UnprocessableEntity, %r{Cannot set default at signup})
         end
+      end
+    end
+
+    describe 'Cleaning up groups when ticket.agent permission is lost' do
+      let(:group) { Group.first }
+
+      it 'creates a ticket.agent role with groups' do
+        role = build(:role, :agent)
+        role.role_groups.build group: group, access: 'full'
+        role.save!
+
+        expect(role.groups).to contain_exactly(group)
+      end
+
+      it 'saves non-ticket.agent role without groups' do
+        role = build(:role, :admin)
+        role.role_groups.build group: group, access: 'full'
+        role.save!
+
+        expect(role.groups).to be_blank
       end
     end
   end

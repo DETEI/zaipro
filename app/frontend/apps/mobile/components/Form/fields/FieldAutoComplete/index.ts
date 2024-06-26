@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import createInput from '#shared/form/core/createInput.ts'
 import addLink from '#shared/form/features/addLink.ts'
@@ -26,6 +26,8 @@ export const autoCompleteProps = [
   'options',
   'initialOptionBuilder',
   'sorting',
+  'complexValue',
+  'clearValue',
 ]
 
 const fieldDefinition = createInput(

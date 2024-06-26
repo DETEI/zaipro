@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { FormFieldContext } from '#shared/components/Form/types/field.ts'
 import type { SelectOption } from '#shared/components/CommonSelect/types.ts'
@@ -13,14 +13,16 @@ export type FlatSelectOption = SelectOption & {
   parents: (string | number | boolean)[]
 }
 
-export type TreeSelectContext = FormFieldContext<{
+export interface TreeSelectProps {
   clearable?: boolean
   disabled?: boolean
-  historicalOptions: Record<string, string>
+  historicalOptions?: Record<string, string>
   multiple?: boolean
+  options: TreeSelectOption[]
   noFiltering?: boolean
   noOptionsLabelTranslation?: boolean
-  options: TreeSelectOption[]
   rejectNonExistentValues?: boolean
   sorting?: SelectOptionSorting
-}>
+}
+
+export type TreeSelectContext = FormFieldContext<TreeSelectProps>

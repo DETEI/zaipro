@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -24,7 +24,7 @@ RSpec.describe 'Integration SMIME', type: :request do
 
     context 'POST requests' do
 
-      let(:parsed_certificate) { SecureMailing::SMIME::Certificate.new(certificate_string) }
+      let(:parsed_certificate) { Certificate::X509::SMIME.new(certificate_string) }
 
       it 'adds certificate by string' do
         expect do

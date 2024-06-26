@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Channel::Driver::Smtp
   include Channel::EmailHelper
@@ -53,9 +53,11 @@ class Channel::Driver::Smtp
     if !options.key?(:enable_starttls_auto)
       options[:enable_starttls_auto] = true
     end
-    if !options.key?(:openssl_verify_mode)
-      options[:openssl_verify_mode] = 'none'
-    end
+    ssl_verify_mode = if options[:openssl_verify_mode].present?
+                        options[:openssl_verify_mode]
+                      else
+                        options.fetch(:ssl_verify, true) ? 'peer' : 'none'
+                      end
 
     # set system_bcc of config if defined
     system_bcc = Setting.get('system_bcc')
@@ -69,7 +71,7 @@ class Channel::Driver::Smtp
 
     mail = Channel::EmailBuild.build(attr, notification)
     smtp_params = {
-      openssl_verify_mode:  options[:openssl_verify_mode],
+      openssl_verify_mode:  ssl_verify_mode,
       address:              options[:host],
       port:                 options[:port],
       domain:               options[:domain],
@@ -89,6 +91,9 @@ class Channel::Driver::Smtp
       smtp_params[:password] = options[:password]
       smtp_params[:authentication] = options[:authentication]
     end
+
+    Certificate::ApplySSLCertificates.ensure_fresh_ssl_context if options[:ssl] || options[:enable_starttls_auto]
+
     mail.delivery_method :smtp, smtp_params
     mail.deliver
   end

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 RSpec.shared_examples 'for agent user' do |access_type|
   let(:member_groups)   { create_list(:group, 2) }
@@ -103,7 +103,7 @@ RSpec.shared_examples 'for agent user' do |access_type|
 
   context 'with indirect access via Role#groups' do
     let(:user) { create(:agent).tap { |u| u.roles << role } }
-    let(:role) { create(:role, groups: member_groups) }
+    let(:role) { create(:role, :agent, groups: member_groups) }
 
     context 'when checking for "full" access' do
       # this is already true by default, but it doesn't hurt to be explicit

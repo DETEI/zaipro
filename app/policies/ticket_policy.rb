@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class TicketPolicy < ApplicationPolicy
 
@@ -12,10 +12,6 @@ class TicketPolicy < ApplicationPolicy
     access?('create')
   end
 
-  def create_feedback?
-    access?('create_feedback')
-  end
-  
   def update?
     access?('change')
   end

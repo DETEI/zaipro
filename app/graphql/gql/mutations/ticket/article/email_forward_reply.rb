@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Mutations
   class Ticket::Article::EmailForwardReply < BaseMutation
@@ -57,7 +57,7 @@ module Gql::Mutations
       group = Group.find_by(name: find_user_by_raw_email(article.to))
       return article.to if !group
 
-      Channel::EmailBuild.recipient_line(group.name, group.email)
+      Channel::EmailBuild.recipient_line(group.fullname, group.email)
     end
 
     def to_agent(article)

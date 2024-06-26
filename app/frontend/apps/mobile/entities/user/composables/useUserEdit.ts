@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { useDialogObjectForm } from '#mobile/components/CommonDialogObjectForm/useDialogObjectForm.ts'
 import { defineFormSchema } from '#mobile/form/defineFormSchema.ts'
@@ -77,6 +77,7 @@ export const useUserEdit = () => {
           formChangeFields.organization_id.help = msg
 
           // TODO: helpClass is not reactive right now, should be fine with a future FormKit version
+          // We need to implement the mention workaround: https://github.com/formkit/formkit/issues/828
           formChangeFields.organization_id.helpClass = helpClass
         }
       },

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/apps/mobile/examples/create_article_examples'
@@ -172,8 +172,8 @@ RSpec.describe 'Mobile > Ticket > Article > Create', app: :mobile, authenticated
           find('[data-name="article-context"]').click
         end
 
-        click_on 'Delete Article'
-        click_on 'OK'
+        click_button 'Delete Article'
+        click_button 'OK'
 
         wait_for_subscription_update('ticketArticleUpdates', number: number)
       end

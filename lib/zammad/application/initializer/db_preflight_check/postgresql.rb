@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # NOTE: Why use PG::Connection over ActiveRecord::Base.connection?
 #
@@ -58,7 +58,7 @@ module Zammad
           end
 
           def self.min_version
-            @min_version ||= '9.3'
+            @min_version ||= '10'
           end
 
           def self.vendor

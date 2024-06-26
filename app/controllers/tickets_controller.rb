@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class TicketsController < ApplicationController
   include CreatesTicketArticles
@@ -7,7 +7,7 @@ class TicketsController < ApplicationController
   include TicketStats
   include CanPaginate
 
-  prepend_before_action -> { authorize! }, only: %i[create create_feedback selector import_example import_start ticket_customer ticket_history ticket_related ticket_recent ticket_merge ticket_split]
+  prepend_before_action -> { authorize! }, only: %i[create import_example import_start ticket_customer ticket_history ticket_related ticket_recent ticket_merge ticket_split]
   prepend_before_action :authentication_check
 
   # GET /api/v1/tickets
@@ -47,48 +47,29 @@ class TicketsController < ApplicationController
 
   # GET /api/v1/tickets/1
   def show
-    if params[:ticket_id].present?
-      ActiveRecord::Base.transaction do
-        feedback = Feedback.new
-        feedback.user_id = UserInfo.current_user_id
-        feedback.ticket_id = params[:ticket_id]
-        feedback.problem_solved = params[:problem_solved]
-        feedback.advisor_rating = params[:advisor_rating]
-        feedback.comments = params[:comments]
-        if feedback.save
-          ticket = Ticket.find(params[:ticket_id])
-          ticket.feedback_solved = true
-          ticket.save!
-          render json: { message: 'Feedback enviado exitosamente' }, status: :created
-        else
-          render json: { errors: feedback.errors.full_messages }, status: :unprocessable_entity
-          raise ActiveRecord::Rollback
-        end
-      end
-    else
-      ticket = Ticket.find(params[:id])
-      authorize!(ticket)
+    ticket = Ticket.find(params[:id])
+    authorize!(ticket)
 
-      auto_assign_ticket(ticket)
-      if response_expand?
-        result = ticket.attributes_with_association_names
-        render json: result, status: :ok
-        return
-      end
+    auto_assign_ticket(ticket)
 
-      if response_full?
-        full = Ticket.full(params[:id])
-        render json: full
-        return
-      end
-
-      if response_all?
-        render json: ticket_all(ticket)
-        return
-      end
-
-      render json: ticket
+    if response_expand?
+      result = ticket.attributes_with_association_names
+      render json: result, status: :ok
+      return
     end
+
+    if response_full?
+      full = Ticket.full(params[:id])
+      render json: full
+      return
+    end
+
+    if response_all?
+      render json: ticket_all(ticket)
+      return
+    end
+
+    render json: ticket
   end
 
   def auto_assign_ticket(ticket)
@@ -185,8 +166,10 @@ class TicketsController < ApplicationController
 
       # create tags if given
       if params[:tags].present?
-        tags = params[:tags].split(',')
+        tags = params[:tags].split(',').map(&:strip)
         tags.each do |tag|
+          next if !::Tag.tag_allowed?(name: tag, user_id: UserInfo.current_user_id)
+
           ticket.tag_add(tag)
         end
       end
@@ -519,29 +502,6 @@ class TicketsController < ApplicationController
       tickets:       ticket_result,
       tickets_count: tickets.count,
       assets:        assets,
-    }
-  end
-
-  # POST /api/v1/tickets/create_feedback
-  def create_feedback
-  end
-
-  # GET /api/v1/tickets/selector
-  def selector
-    ticket_count, tickets = Ticket.selectors(params[:condition], limit: 6, execution_time: true)
-
-    assets = {}
-    ticket_ids = []
-    tickets&.each do |ticket|
-      ticket_ids.push ticket.id
-      assets = ticket.assets(assets)
-    end
-
-    # return result
-    render json: {
-      ticket_ids:   ticket_ids,
-      ticket_count: ticket_count || 0,
-      assets:       assets,
     }
   end
 

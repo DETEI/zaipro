@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::Unit::Import::Freshdesk::Agents < Sequencer::Unit::Import::Freshdesk::SubSequence::Object
   class GroupsPermissions < Sequencer::Unit::Base
@@ -14,7 +14,7 @@ class Sequencer::Unit::Import::Freshdesk::Agents < Sequencer::Unit::Import::Fres
 
     def group_ids_access_map
       @group_ids_access_map ||= begin
-        ::Group.all.pluck(:id).index_with do
+        ::Group.pluck(:id).index_with do
           'full'.freeze
         end
       end

@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import stopEvent from '#shared/utils/events.ts'
@@ -84,9 +84,7 @@ const updateLocalValue = (e: Event) => {
     type="button"
     role="switch"
     class="relative inline-flex h-6 w-10 flex-shrink-0 cursor-pointer rounded-full border border-transparent bg-gray-300 transition-colors duration-200 ease-in-out focus-within:ring-1 focus-within:ring-white focus-within:ring-opacity-75 focus:outline-none formkit-invalid:border-solid formkit-invalid:border-red"
-    :class="{
-      '!bg-blue': localValue,
-    }"
+    :class="[context.classes.input, { '!bg-blue': localValue }]"
     :aria-labelledby="`label-${context.id}`"
     :aria-disabled="disabled"
     :aria-checked="localValue"

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/application_model_examples'
@@ -1812,6 +1812,96 @@ RSpec.describe User, type: :model do
 
         expect { agent.roles = [Role.lookup(name: 'Customer')] }
           .not_to change { agent.reload.preferences.dig('notification_config', 'matrix') }
+      end
+    end
+  end
+
+  describe 'Sanitizes name attributes for offending URLs' do
+    shared_examples 'sanitizing user name attributes' do |firstname, lastname|
+      it 'sanitizes user name attributes' do
+        expect(user).to have_attributes(firstname: firstname, lastname: lastname)
+      end
+    end
+
+    context 'with firstname attribute only' do
+      let(:user) { create(:customer, firstname: value, lastname: nil, email: Faker::Internet.unique.email) }
+
+      context 'when equaling a URL with a scheme' do
+        let(:value) { 'https://zammad.org/participate' }
+
+        it_behaves_like 'sanitizing user name attributes', 'zammad.org/participate'
+      end
+
+      context 'when equaling a URL without a scheme' do
+        let(:value) { 'zammad.org' }
+
+        it_behaves_like 'sanitizing user name attributes', 'zammad.org'
+      end
+
+      context 'when containing a URL with a scheme' do
+        let(:value) { 'Click here to confirm https://zammad.org/participate then log in' }
+
+        it_behaves_like 'sanitizing user name attributes', 'Click', 'here to confirm zammad.org/participate then log in'
+      end
+
+      context 'when containing a URL with an invalid scheme' do
+        let(:value) { 'A: Testing' }
+
+        it_behaves_like 'sanitizing user name attributes', 'A:', 'Testing'
+      end
+    end
+
+    context 'with lastname attribute only' do
+      let(:user) { create(:customer, firstname: nil, lastname: value, email: Faker::Internet.unique.email) }
+
+      context 'when equaling a URL with a scheme' do
+        let(:value) { 'https://zammad.org/participate' }
+
+        it_behaves_like 'sanitizing user name attributes', nil, 'zammad.org/participate'
+      end
+
+      context 'when equaling a URL without a scheme' do
+        let(:value) { 'zammad.org' }
+
+        it_behaves_like 'sanitizing user name attributes', nil, 'zammad.org'
+      end
+
+      context 'when containing a URL with a scheme' do
+        let(:value) { 'Click here to confirm https://zammad.org/participate then log in' }
+
+        it_behaves_like 'sanitizing user name attributes', 'Click', 'here to confirm zammad.org/participate then log in'
+      end
+    end
+
+    context 'with both firstname and lastname attribute' do
+      let(:user) { create(:customer, firstname: firstname, lastname: lastname, email: Faker::Internet.unique.email) }
+
+      context 'when equaling a URL with a scheme' do
+        let(:firstname) { 'Click here to confirm' }
+        let(:lastname)  { 'https://zammad.org/participate' }
+
+        it_behaves_like 'sanitizing user name attributes', 'Click here to confirm', 'zammad.org/participate'
+      end
+
+      context 'when equaling a URL without a scheme' do
+        let(:firstname) { 'zammad.org' }
+        let(:lastname) { 'Foundation' }
+
+        it_behaves_like 'sanitizing user name attributes', 'zammad.org', 'Foundation'
+      end
+
+      context 'when containing a URL with a scheme' do
+        let(:firstname) { 'Click here to confirm' }
+        let(:lastname)  { 'https://zammad.org/participate then log in' }
+
+        it_behaves_like 'sanitizing user name attributes', 'Click here to confirm', 'zammad.org/participate then log in'
+      end
+
+      context 'when containing a URL with an invalid scheme' do
+        let(:firstname) { 'Dummy R: Berlin' }
+        let(:lastname)  { 'Mail' }
+
+        it_behaves_like 'sanitizing user name attributes', 'Dummy R: Berlin', 'Mail'
       end
     end
   end

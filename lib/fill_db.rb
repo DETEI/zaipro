@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # rubocop:disable Rails/Output
 module FillDb
@@ -246,7 +246,7 @@ or if you only want to create 100 tickets
         ActiveRecord::Base.transaction do
 
           create_params = {
-            name:   "FillGroup::#{counter}",
+            name:   "FillGroup#{counter}",
             active: true,
           }
 

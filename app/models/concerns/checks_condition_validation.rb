@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module ChecksConditionValidation
   extend ActiveSupport::Concern
@@ -9,6 +9,6 @@ module ChecksConditionValidation
   end
 
   def validate_condition
-    raise Exceptions::UnprocessableEntity, __('Invalid ticket selector conditions') if !Ticket::Selector::Sql.new(selector: condition, options: { current_user: User.find(1) }).valid?
+    raise Exceptions::UnprocessableEntity, __('Invalid object selector conditions') if !Selector::Sql.new(selector: condition, options: { current_user: User.find(1) }, target_class: try(:object)&.constantize || Ticket).valid?
   end
 end

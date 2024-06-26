@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'browser_test_helper'
 
@@ -74,7 +74,7 @@ class AgentTicketCreateResetCustomerSelectionTest < TestCase
       value: 'some body',
     )
     select(
-      css:   '.content.active .newTicket select[name="group_id"]',
+      css:   '.content.active .newTicket input[name="group_id"]',
       value: 'Users',
     )
     click(css: '.content.active .newTicket .js-submit')
@@ -158,7 +158,7 @@ class AgentTicketCreateResetCustomerSelectionTest < TestCase
       value: 'some body',
     )
     select(
-      css:   '.content.active .newTicket select[name="group_id"]',
+      css:   '.content.active .newTicket input[name="group_id"]',
       value: 'Users',
     )
     click(css: '.content.active .newTicket .js-submit')

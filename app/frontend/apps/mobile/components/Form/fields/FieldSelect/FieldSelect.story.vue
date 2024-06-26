@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { FormKit } from '@formkit/vue'
@@ -244,7 +244,7 @@ const options = [
     label: 'Option Icon',
     name: 'select_icon',
   },
-]
+] as any
 </script>
 
 <template>

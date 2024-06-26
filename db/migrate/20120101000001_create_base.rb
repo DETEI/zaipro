@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class CreateBase < ActiveRecord::Migration[4.2]
   def up
@@ -115,7 +115,9 @@ class CreateBase < ActiveRecord::Migration[4.2]
     create_table :groups do |t|
       t.references :signature,                      null: true
       t.references :email_address,                  null: true
-      t.string :name,                   limit: 160, null: false
+      t.string :name,   limit: (160 * 6) + (2 * 5), null: false # max depth of 6 and 5 delimiters inbetween
+      t.string :name_last,              limit: 160, null: false
+      t.integer :parent_id,                         null: true
       t.integer :assignment_timeout,                null: true
       t.string :follow_up_possible,     limit: 100, null: false, default: 'yes'
       t.integer :reopen_time_in_days,               null: true
@@ -132,6 +134,7 @@ class CreateBase < ActiveRecord::Migration[4.2]
     add_foreign_key :groups, :email_addresses
     add_foreign_key :groups, :users, column: :created_by_id
     add_foreign_key :groups, :users, column: :updated_by_id
+    add_foreign_key :groups, :groups, column: :parent_id
 
     create_table :roles do |t|
       t.string :name,                   limit: 100, null: false
@@ -790,6 +793,29 @@ class CreateBase < ActiveRecord::Migration[4.2]
     add_foreign_key :mentions, :users, column: :updated_by_id
     add_foreign_key :mentions, :users, column: :user_id
 
+    create_table :jobs do |t|
+      t.column :name,                 :string,  limit: 250,    null: false
+      t.column :timeplan,             :string,  limit: 2500,   null: false
+      t.column :object,               :string,  limit: 100,    null: false
+      t.column :condition,            :text, limit: 500.kilobytes + 1, null: false
+      t.column :perform,              :text, limit: 500.kilobytes + 1, null: false
+      t.column :disable_notification, :boolean,                null: false, default: true
+      t.column :last_run_at,          :timestamp, limit: 3,    null: true
+      t.column :next_run_at,          :timestamp, limit: 3,    null: true
+      t.column :running,              :boolean,                null: false, default: false
+      t.column :processed,            :integer,                null: false, default: 0
+      t.column :matching,             :integer,                null: false
+      t.column :pid,                  :string,  limit: 250,    null: true
+      t.column :note,                 :string,  limit: 250,    null: true
+      t.column :active,               :boolean,                null: false, default: false
+      t.column :updated_by_id,        :integer,                null: false
+      t.column :created_by_id,        :integer,                null: false
+      t.timestamps limit: 3, null: false
+    end
+    add_index :jobs, [:name], unique: true
+    add_foreign_key :jobs, :users, column: :created_by_id
+    add_foreign_key :jobs, :users, column: :updated_by_id
+
     create_table :core_workflows do |t|
       t.string :name,                     limit: 100, null: false
       t.string :object,                   limit: 100, null: true
@@ -879,5 +905,16 @@ class CreateBase < ActiveRecord::Migration[4.2]
     add_index :pgp_keys, [:domain_alias]
     add_foreign_key :pgp_keys, :users, column: :created_by_id
     add_foreign_key :pgp_keys, :users, column: :updated_by_id
+
+    create_table :ssl_certificates do |t|
+      t.string   :fingerprint,  limit: 250,          null: false
+      t.binary   :certificate,  limit: 10.megabytes, null: false
+      t.string   :subject,      limit: 250,          null: false
+      t.datetime :not_before,   limit: 3,            null: false
+      t.datetime :not_after,    limit: 3,            null: false
+      t.boolean  :ca,           default: false,      null: false
+
+      t.timestamps limit: 3, null: false
+    end
   end
 end

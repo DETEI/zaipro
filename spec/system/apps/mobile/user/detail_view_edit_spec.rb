@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/apps/mobile/examples/core_workflow_examples'
@@ -116,7 +116,7 @@ RSpec.describe 'Mobile > Search > User > Edit', app: :mobile, authenticated_as: 
       find_autocomplete('Secondary organizations')
         .search_for_options(organizations[0..1].map(&:name))
 
-      click_on 'Save'
+      click_button 'Save'
 
       expect(page)
         .to have_multiple_texts(organizations[0..1].map(&:name))

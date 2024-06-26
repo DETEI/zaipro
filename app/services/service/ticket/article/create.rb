@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Service::Ticket::Article::Create < Service::BaseWithCurrentUser
   def execute(article_data:, ticket:)
@@ -76,7 +76,7 @@ class Service::Ticket::Article::Create < Service::BaseWithCurrentUser
 
   def transform_to_from(article)
     customer_display_name = display_name(article.ticket.customer)
-    group_name = article.ticket.group.name
+    group_name = article.ticket.group.fullname
 
     if article.sender.name.eql?('Customer')
       article.from = customer_display_name

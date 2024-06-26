@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import CommonInputSearch, {
@@ -25,6 +25,7 @@ const { localValue } = useValue(toRef(props, 'context'))
     :placeholder="props.context.placeholder || props.context.attrs.placeholder"
     :wrapper-class="props.context.wrapperClass"
     no-border
+    :class="context.classes.input"
     @blur="context.handlers.blur"
   />
 </template>

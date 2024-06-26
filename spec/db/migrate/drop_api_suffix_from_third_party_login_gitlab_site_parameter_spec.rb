@@ -1,11 +1,8 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/FilePath
 RSpec.describe DropApiSuffixFromThirdPartyLoginGitLabSiteParameter, type: :db_migration do
-  # rubocop:enable RSpec/FilePath
-
   before do
     old_auth_gitlab_form = Setting.find_by(name: 'auth_gitlab_credentials').options[:form]
     old_auth_gitlab_form[2][:placeholder] = 'https://gitlab.YOURDOMAIN.com/api/v4'

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class KnowledgeBase
   class InternalAssets
@@ -68,7 +68,7 @@ class KnowledgeBase
     end
 
     def accessible_categories_calculate_scope
-      return KnowledgeBase::Category.all.find_in_batches if @categories_filter.blank?
+      return KnowledgeBase::Category.find_in_batches if @categories_filter.blank?
 
       Array(@categories_filter)
         .map(&:self_with_children)

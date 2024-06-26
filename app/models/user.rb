@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class User < ApplicationModel
   include CanBeImported
@@ -13,6 +13,8 @@ class User < ApplicationModel
   include HasObjectManagerAttributes
   include HasTaskbars
   include HasTwoFactor
+  include CanSelector
+  include CanPerformChanges
   include User::Assets
   include User::Avatar
   include User::Search
@@ -53,12 +55,15 @@ class User < ApplicationModel
   validate :ensure_identifier, :ensure_email
   validate :ensure_uniq_email, unless: :skip_ensure_uniq_email
 
+  available_perform_change_actions :data_privacy_deletion_task, :attribute_updates
+
   # workflow checks should run after before_create and before_update callbacks
   # the transaction dispatcher must be run after the workflow checks!
   include ChecksCoreWorkflow
   include HasTransactionDispatcher
 
-  core_workflow_screens 'create', 'edit'
+  core_workflow_screens 'create', 'edit', 'invite_agent'
+  core_workflow_admin_screens 'create', 'edit'
 
   store :preferences
 
@@ -723,6 +728,16 @@ returns
     # to prevent any unexpected regressions.)
     User.find(user_id_of_duplicate_user)
 
+    # mentions can not merged easily because the new user could have mentioned
+    # the same ticket so we delete duplicates beforehand
+    Mention.where(user_id: user_id_of_duplicate_user).find_each do |mention|
+      if Mention.exists?(mentionable: mention.mentionable, user_id: id)
+        mention.destroy
+      else
+        mention.update(user_id: id)
+      end
+    end
+
     # merge missing attributes
     Models.merge('User', id, user_id_of_duplicate_user)
 
@@ -879,8 +894,8 @@ try to find correct name
   end
 
   def check_name
-    firstname&.strip!
-    lastname&.strip!
+    self.firstname = sanitize_name(firstname)
+    self.lastname  = sanitize_name(lastname)
 
     return if firstname.present? && lastname.present?
 
@@ -893,6 +908,25 @@ try to find correct name
 
     check_name_apply(:firstname, local_firstname)
     check_name_apply(:lastname, local_lastname)
+  end
+
+  def sanitize_name(value)
+    result = value&.strip
+
+    return result if result.blank?
+
+    result.split(%r{\s}).map { |v| strip_uri(v) }.join("\s")
+  end
+
+  def strip_uri(value)
+    uri = URI.parse(value)
+
+    return value if !uri || uri.scheme.blank? || uri.hostname.blank?
+
+    # Strip the scheme from the URI.
+    uri.hostname + uri.path
+  rescue
+    value
   end
 
   def check_name_apply(identifier, input)
@@ -1000,7 +1034,7 @@ try to find correct name
       where += ' OR ' if where != ''
       where += 'permissions.name = ? OR permissions.name LIKE ?'
       where_bind.push permission_name
-      where_bind.push "#{permission_name}.%"
+      where_bind.push "#{SqlHelper.quote_like(permission_name)}.%"
     end
     return [] if where == ''
 

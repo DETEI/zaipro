@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 CoreWorkflow.create_if_not_exists(
   name:            'base - hide pending time on non pending states',
@@ -130,6 +130,45 @@ CoreWorkflow.create_if_not_exists(
   },
   changeable:      false,
   priority:        99_999,
+  created_by_id:   1,
+  updated_by_id:   1,
+)
+CoreWorkflow.create_if_not_exists(
+  name:            'base - remove current and child groups from parent id',
+  object:          'Group',
+  condition_saved: {
+    'custom.module': {
+      operator: 'match all modules',
+      value:    [
+        'CoreWorkflow::Custom::AdminGroupParentId',
+      ],
+    },
+  },
+  perform:         {
+    'custom.module': {
+      execute: ['CoreWorkflow::Custom::AdminGroupParentId']
+    },
+  },
+  changeable:      false,
+  created_by_id:   1,
+  updated_by_id:   1,
+)
+CoreWorkflow.create_if_not_exists(
+  name:            'base - show group list for agents',
+  condition_saved: {
+    'custom.module': {
+      operator: 'match all modules',
+      value:    [
+        'CoreWorkflow::Custom::AdminShowGroupListForAgents',
+      ],
+    },
+  },
+  perform:         {
+    'custom.module': {
+      execute: ['CoreWorkflow::Custom::AdminShowGroupListForAgents']
+    },
+  },
+  changeable:      false,
   created_by_id:   1,
   updated_by_id:   1,
 )

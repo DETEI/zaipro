@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module CommonActions
 
@@ -132,8 +132,8 @@ module CommonActions
   # @see Capybara::Session#visit
   #
   # @example
-  #  visit('logout')
-  # => visited SPA route 'localhost:32435/#logout'
+  #  visit('signup')
+  # => visited SPA route 'localhost:32435/#signup'
   #
   # @example
   #  visit('/test/ui')
@@ -165,7 +165,7 @@ module CommonActions
     wait_for_loading_to_complete(route: route, app: app, skip_waiting: skip_waiting)
   end
 
-  def wait_for_loading_to_complete(route:, app: self.class.metadata[:app], skip_waiting: false)
+  def wait_for_loading_to_complete(route: nil, app: self.class.metadata[:app], skip_waiting: false, wait_ws: false)
     case app
     when :mobile
       return if skip_waiting
@@ -181,6 +181,9 @@ module CommonActions
 
       # make sure loading is completed (e.g. ticket zoom may take longer)
       expect(page).to have_no_css('.icon-loading', wait: 30) if !skip_waiting
+
+      # make sure WS connection is ready to use
+      ensure_websocket if wait_ws
     end
   end
 
@@ -279,11 +282,16 @@ module CommonActions
     end
   end
 
-  def use_template(template)
+  def use_template(template, without_taskbar: false)
     field  = find('#form-template select[name="id"]')
     option = field.find(:option, template.name)
     option.select_option
+
+    taskbar_timestamp = Taskbar.last.updated_at if !without_taskbar
+
     click '.sidebar-content .js-apply'
+
+    wait.until { Taskbar.last.updated_at != taskbar_timestamp } if !without_taskbar
   end
 
   # Checks if modal is ready.
@@ -382,6 +390,13 @@ module CommonActions
         click '.js-submit'
       end
     end
+  end
+
+  def refresh_with_wait
+    page.refresh
+
+    # After the refresh, we must explictly wait for the app to be completely ready.
+    wait_for_loading_to_complete(wait_ws: true)
   end
 
   private

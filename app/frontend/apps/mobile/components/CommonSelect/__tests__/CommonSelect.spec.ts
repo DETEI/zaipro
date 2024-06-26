@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { i18n } from '#shared/i18n.ts'
 import { renderComponent } from '#tests/support/components/index.ts'
@@ -61,7 +61,6 @@ describe('interacting with CommonSelect', () => {
     await view.events.click(view.getByText('Open Select'))
 
     expect(
-      // TODO should work just with view.getByIconName('mobile-check') with Vitest 0.19
       view.getByIconName((name, node) => {
         return (
           name === '#icon-mobile-check' &&

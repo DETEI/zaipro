@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class SearchIndexBackend
 
@@ -189,6 +189,7 @@ Check if an index exists.
 =begin
 
 This function updates specifc attributes of an index based on a query.
+It should get used in batches to prevent performance issues on entities which have millions of objects in it.
 
   data = {
     organization: {
@@ -196,7 +197,9 @@ This function updates specifc attributes of an index based on a query.
     }
   }
   where = {
-    organization_id: 1
+    term: {
+      organization_id: 1
+    }
   }
   SearchIndexBackend.update_by_query('Ticket', data, where)
 
@@ -206,7 +209,12 @@ This function updates specifc attributes of an index based on a query.
     return if data.blank?
     return if where.blank?
 
-    url = build_url(type: type, action: '_update_by_query', with_pipeline: false, with_document_type: false, url_params: { conflicts: 'proceed' })
+    url_params = {
+      conflicts: 'proceed',
+      slices:    'auto',
+      max_docs:  1_000,
+    }
+    url = build_url(type: type, action: '_update_by_query', with_pipeline: false, with_document_type: false, url_params: url_params)
     return if url.blank?
 
     script_list = []
@@ -220,12 +228,24 @@ This function updates specifc attributes of an index based on a query.
         source: script_list.join(';'),
         params: data,
       },
-      query:  {
-        term: where,
+      query:  where,
+      sort:   {
+        id: 'desc',
       },
     }
 
-    make_request_and_validate(url, data: data, method: :post, read_timeout: 10.minutes)
+    response = make_request(url, data: data, method: :post, read_timeout: 10.minutes)
+    if !response.success?
+      Rails.logger.error humanized_error(
+        verb:     'GET',
+        url:      url,
+        payload:  data,
+        response: response,
+      )
+      return []
+    end
+
+    response.data
   end
 
 =begin
@@ -477,7 +497,7 @@ example for aggregations within one year
     url = build_url(type: index, action: '_search', with_pipeline: false, with_document_type: false)
     return if url.blank?
 
-    data = selector2query(selectors, options, aggs_interval)
+    data = selector2query(index, selectors, options, aggs_interval)
 
     response = make_request(url, data: data, method: :post)
 
@@ -492,9 +512,9 @@ example for aggregations within one year
     Rails.logger.debug { response.data.to_json }
 
     if aggs_interval.blank? || aggs_interval[:interval].blank?
-      ticket_ids = []
+      object_ids = []
       response.data['hits']['hits'].each do |item|
-        ticket_ids.push item['_id']
+        object_ids.push item['_id']
       end
 
       # in lower ES 6 versions, we get total count directly, in higher
@@ -505,14 +525,14 @@ example for aggregations within one year
       end
       return {
         count:      count,
-        ticket_ids: ticket_ids,
+        object_ids: object_ids,
       }
     end
     response.data
   end
 
-  def self.selector2query(selector, options, aggs_interval)
-    Ticket::Selector::SearchIndex.new(selector: selector, options: options.merge(aggs_interval: aggs_interval)).get
+  def self.selector2query(index, selector, options, aggs_interval)
+    Selector::SearchIndex.new(selector: selector, options: options.merge(aggs_interval: aggs_interval), target_class: index.constantize).get
   end
 
 =begin
@@ -715,6 +735,7 @@ helper method for making HTTP calls
       open_socket_tries: 3,
       user:              Setting.get('es_user'),
       password:          Setting.get('es_password'),
+      verify_ssl:        Setting.get('es_ssl_verify'),
     }
 
     response = UserAgent.send(method, url, data, options)

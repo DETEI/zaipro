@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/examples/pagination_examples'
@@ -33,7 +33,7 @@ RSpec.describe 'Manage > Report Profiles', type: :system do
       it 'creates an inactive profile report' do
         within :active_content do
           within '.page-content' do
-            expect(page).to have_selector('tr.item.is-inactive')
+            expect(page).to have_css('tr.item.is-inactive')
               .and have_text(name)
           end
         end

@@ -1,10 +1,10 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
 RSpec.describe SMIMEMetaInformationData, db_strategy: :reset, type: :db_migration do
   let(:smime_certificate) { create(:smime_certificate, fixture: 'smime1@example.com') }
-  let(:smime_object)      { SecureMailing::SMIME::Certificate.new(smime_certificate.pem) }
+  let(:smime_object)      { Certificate::X509::SMIME.new(smime_certificate.pem) }
 
   describe 'migrate smime_certificates' do
     before do

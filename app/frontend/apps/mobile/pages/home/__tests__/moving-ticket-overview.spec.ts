@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { getAllByTestId, getByTestId, within } from '@testing-library/vue'
 import { visitView } from '#tests/support/components/visitView.ts'
@@ -35,9 +35,8 @@ describe('playing with overviews', () => {
       await view.findByTestId('includedOverviews'),
     )
 
-    const includedOverviews = await includedOverviewsUtils.findAllByTestId(
-      'overviewItem',
-    )
+    const includedOverviews =
+      await includedOverviewsUtils.findAllByTestId('overviewItem')
 
     expect(includedOverviews).toHaveLength(2)
     expect(includedOverviews[0]).toHaveTextContent('Overview 1')

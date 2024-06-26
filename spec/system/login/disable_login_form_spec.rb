@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -8,7 +8,7 @@ RSpec.describe 'Disable login form', authenticated_as: false, type: :system do
 
     it 'shows login form' do
       visit '/'
-      expect(page).to have_selector('#login')
+      expect(page).to have_css('#login')
     end
   end
 
@@ -18,7 +18,7 @@ RSpec.describe 'Disable login form', authenticated_as: false, type: :system do
     it 'show login form when no third application enable' do
       Setting.set 'auth_saml', false
       visit '/'
-      expect(page).to have_selector('#login')
+      expect(page).to have_css('#login')
     end
 
     it 'show hide form when third application' do

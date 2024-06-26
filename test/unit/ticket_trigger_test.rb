@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'test_helper'
 
@@ -1215,7 +1215,7 @@ class TicketTriggerTest < ActiveSupport::TestCase
       condition:            {
         'ticket.state_id' => {
           'operator' => 'is',
-          'value'    => Ticket::State.all.pluck(:id),
+          'value'    => Ticket::State.pluck(:id),
         },
         'ticket.action'   => {
           'operator' => 'is',
@@ -1305,7 +1305,7 @@ class TicketTriggerTest < ActiveSupport::TestCase
       condition:            {
         'ticket.state_id' => {
           'operator' => 'is',
-          'value'    => Ticket::State.all.pluck(:id),
+          'value'    => Ticket::State.pluck(:id),
         },
         'ticket.action'   => {
           'operator' => 'is',
@@ -3136,7 +3136,7 @@ class TicketTriggerTest < ActiveSupport::TestCase
       condition:            {
         'ticket.state_id'   => {
           'operator' => 'is',
-          'value'    => Ticket::State.all.pluck(:id),
+          'value'    => Ticket::State.pluck(:id),
         },
         'article.sender_id' => {
           'operator' => 'is',

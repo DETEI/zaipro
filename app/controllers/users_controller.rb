@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class UsersController < ApplicationController
   include ChecksUserAttributesByCurrentUserPermission
@@ -965,7 +965,7 @@ curl http://localhost/api/v1/users/avatar -v -u #{login}:#{password} -H "Content
 
   def password_login?
     return true if Setting.get('user_show_password_login')
-    return true if Setting.where('name LIKE ? AND frontend = true', 'auth_%')
+    return true if Setting.where('name LIKE ? AND frontend = true', "#{SqlHelper.quote_like('auth_')}%")
       .map { |provider| provider.state_current['value'] }
       .all?(false)
 
@@ -1121,7 +1121,7 @@ curl http://localhost/api/v1/users/avatar -v -u #{login}:#{password} -H "Content
     user = User.new(clean_user_params)
     user.associations_from_param(params)
     user.role_ids  = Role.where(name: %w[Admin Agent]).pluck(:id)
-    user.group_ids = Group.all.pluck(:id)
+    user.group_ids = Group.pluck(:id)
 
     UserInfo.ensure_current_user_id do
       user.save!

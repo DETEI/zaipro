@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/examples/security_keys_setup_examples'
@@ -155,7 +155,7 @@ RSpec.describe 'Profile > Password', authenticated_as: :user, type: :system do
         in_modal do
           fill_in 'Password', with: user.password_plain
 
-          click_on 'Remove'
+          click_button 'Remove'
         end
 
         within('tr[data-two-factor-key="authenticator_app"]') do

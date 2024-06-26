@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class SecureMailing::SMIME::SecurityOptions < SecureMailing::Backend::HandlerSecurityOptions
 
@@ -56,7 +56,7 @@ class SecureMailing::SMIME::SecurityOptions < SecureMailing::Backend::HandlerSec
     false
   end
 
-  def certificates_valid?(encryption_result, certs, recipients) # rubocop:disable Metrics/AbcSize
+  def certificates_valid?(encryption_result, certs, recipients)
     result = false
 
     if certs

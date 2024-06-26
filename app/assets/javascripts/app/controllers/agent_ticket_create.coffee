@@ -137,7 +137,7 @@ class App.TicketCreate extends App.Controller
 
     # force changing signature
     # skip on initialization because it will trigger core workflow
-    @$('[name="group_id"]').trigger('change', true)
+    @$('[name="group_id"]').trigger('change', non_interactive: true)
 
     # add observer to change options
     @$('[name="cc"], [name="group_id"], [name="customer_id"]').on('change', =>
@@ -236,7 +236,7 @@ class App.TicketCreate extends App.Controller
   dirtyMonitorStart: =>
     @dirty = {}
 
-    update = (e, nonInteractive) =>
+    update = (e, args) =>
       { target } = e
 
       field = target.getAttribute('name') || target.getAttribute('data-name')
@@ -247,7 +247,7 @@ class App.TicketCreate extends App.Controller
         return
 
       # Skip tracking of non-interactive fields
-      if nonInteractive || field == 'id'
+      if (_.isObject(args) && args.non_interactive) || field == 'id'
         @log 'debug', 'ticket create dirty monitor', 'non-interactive change', field
         return
 
@@ -302,9 +302,15 @@ class App.TicketCreate extends App.Controller
   buildScreen: (params) =>
 
     if _.isEmpty(params.ticket_id) && _.isEmpty(params.article_id)
-      if !_.isEmpty(params.customer_id)
-        @renderQueue(options: _.omit(params, 'id'))
+
+      # remove not form relevant options
+      localOptions = _.omit(params, 'id', 'query', 'shown', 'taskKey', 'ticket_id', 'article_id', 'appEl', 'el', 'type')
+      localOptions = _.omit(localOptions, _.isUndefined)
+
+      if !_.isEmpty(localOptions)
+        @renderQueue(options: localOptions)
         return
+
       @renderQueue()
       return
 
@@ -609,6 +615,11 @@ class App.TicketCreate extends App.Controller
     # update params with new customer selection
     # to replace in text modules properly
     params.customer = App.User.find(params.customer_id) || {}
+
+    # show selected user display name in customer attribute in UI
+    if _.isEmpty(@el.find('input[name=customer_id_completion]').val())
+      if params.customer && params.customer.displayName
+        @el.find('input[name=customer_id_completion]').val(params.customer.displayName())
 
     @sidebarWidget.render(params)
     @textModule.reload(

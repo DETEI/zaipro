@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::Unit::Import::Freshdesk::ObjectAttribute::Config < Sequencer::Unit::Base
   prepend ::Sequencer::Unit::Import::Common::Model::Mixin::Skip::Action
@@ -71,7 +71,7 @@ class Sequencer::Unit::Import::Freshdesk::ObjectAttribute::Config < Sequencer::U
     }.merge(data_type_options)
   end
 
-  def data_type_options # rubocop:disable Metrics/CyclomaticComplexity
+  def data_type_options
 
     case data_type
     when 'date', 'datetime'

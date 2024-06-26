@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class GroupsController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
@@ -49,7 +49,7 @@ curl http://localhost/api/v1/groups -v -u #{login}:#{password}
 =end
 
   def index
-    model_index_render(Group, params)
+    model_index_render(Group.sorted, params)
   end
 
 =begin

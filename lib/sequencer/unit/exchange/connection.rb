@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::Unit::Exchange::Connection < Sequencer::Unit::Common::Provider::Fallback
 
@@ -135,6 +135,7 @@ class Sequencer::Unit::Exchange::Connection < Sequencer::Unit::Common::Provider:
       end
 
       def ssl_config(opts)
+        Certificate::ApplySSLCertificates.ensure_fresh_ssl_context
         @httpcli.ssl_config.verify_mode = opts[:ssl_verify_mode] if opts[:ssl_verify_mode]
         @httpcli.ssl_config.ssl_version = opts[:ssl_version] if opts[:ssl_version]
       end

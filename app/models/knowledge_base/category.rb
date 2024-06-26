@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class KnowledgeBase::Category < ApplicationModel
   include HasTranslations
@@ -31,6 +31,8 @@ class KnowledgeBase::Category < ApplicationModel
                          dependent:  :destroy
 
   validates :category_icon, presence: true
+
+  validate :cannot_be_child_of_parent
 
   scope :root,   -> { where(parent: nil) }
   scope :sorted, -> { order(position: :asc) }
@@ -137,7 +139,6 @@ class KnowledgeBase::Category < ApplicationModel
   def cannot_be_child_of_parent
     errors.add(:parent_id, __('cannot be a subcategory of the parent category')) if self_parent?(self)
   end
-  validate :cannot_be_child_of_parent
 
   def sibling_categories
     parent&.children || knowledge_base.categories.root

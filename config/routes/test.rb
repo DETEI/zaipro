@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 if !Rails.env.production?
   Zammad::Application.routes.draw do
@@ -21,5 +21,12 @@ if !Rails.env.production?
     match 'test_basic_auth/put/:sec',    to: 'user_agent_test_basic_auth#put',      via: :put
     match 'test_basic_auth/delete/:sec', to: 'user_agent_test_basic_auth#delete',   via: :delete
     match 'test_basic_auth/redirect',    to: 'user_agent_test_basic_auth#redirect', via: :get
+
+    # user agent tests with bearer token auth
+    match 'test_bearer_auth/get/:sec',    to: 'user_agent_test_bearer_auth#get',      via: %i[get options]
+    match 'test_bearer_auth/post/:sec',   to: 'user_agent_test_bearer_auth#post',     via: :post
+    match 'test_bearer_auth/put/:sec',    to: 'user_agent_test_bearer_auth#put',      via: :put
+    match 'test_bearer_auth/delete/:sec', to: 'user_agent_test_bearer_auth#delete',   via: :delete
+    match 'test_bearer_auth/redirect',    to: 'user_agent_test_bearer_auth#redirect', via: :get
   end
 end

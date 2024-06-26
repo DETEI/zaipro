@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -131,6 +131,68 @@ RSpec.describe 'Knowledge Base Locale Answer Edit', type: :system do
     end
   end
 
+  describe 'linked tickets' do
+    let(:ticket) { Ticket.first }
+
+    it 'links a ticket' do
+      visit "#knowledge_base/#{knowledge_base.id}/locale/#{locale_name}/answer/#{published_answer.id}/edit"
+
+      within '.knowledge-base-sidebar .sidebar-linked-tickets' do
+        click '.js-add'
+      end
+
+      in_modal do
+        fill_in 'ticket_number', with: ticket.number
+
+        click '.js-submit'
+      end
+
+      within '.knowledge-base-sidebar .sidebar-linked-tickets' do
+        expect(page).to have_text(ticket.title)
+      end
+
+      added_link = Link.list(link_object: 'Ticket', link_object_value: ticket.id).last
+
+      expect(added_link).to eq({
+                                 'link_object'       => 'KnowledgeBase::Answer::Translation',
+                                 'link_object_value' => published_answer.translations.first.id,
+                                 'link_type'         => 'normal',
+                               })
+    end
+
+    context 'when a linked ticket exists' do
+      before do
+        create(:link, from: ticket, to: published_answer.translations.first)
+
+        visit "#knowledge_base/#{knowledge_base.id}/locale/#{locale_name}/answer/#{published_answer.id}/edit"
+      end
+
+      it 'shows a linked ticket' do
+        within '.knowledge-base-sidebar .sidebar-linked-tickets' do
+          expect(page).to have_text(ticket.title)
+        end
+      end
+
+      it 'removes a linked ticket' do
+        within '.knowledge-base-sidebar .sidebar-linked-tickets' do
+          click '.js-delete'
+
+          expect(page).to have_no_text(ticket.title)
+        end
+
+        expect(Link.list(link_object: 'Ticket', link_object_value: ticket.id)).to be_blank
+      end
+
+      context 'when agent has no acess to ticket', authenticated_as: -> { create(:admin) } do
+        it 'does not show a linked ticket' do
+          within '.knowledge-base-sidebar .sidebar-linked-tickets' do
+            expect(page).to have_no_text(ticket.title)
+          end
+        end
+      end
+    end
+  end
+
   context 'deleted by another user' do
     before do
       visit "#knowledge_base/#{knowledge_base.id}/locale/#{primary_locale.system_locale.locale}/answer/#{published_answer.id}/edit"
@@ -174,6 +236,28 @@ RSpec.describe 'Knowledge Base Locale Answer Edit', type: :system do
       within :active_content do
         expect(page).to have_text('new title')
       end
+    end
+  end
+
+  describe 'previewing' do
+    before do
+      visit "#knowledge_base/#{knowledge_base.id}/locale/#{primary_locale.system_locale.locale}/answer/#{draft_answer.id}/edit"
+    end
+
+    it 'opens preview' do
+      new_window = window_opened_by { click '.icon-external' }
+
+      within_window new_window do
+        within '.main--article' do
+          expect(page).to have_text(draft_answer.translations.first.title)
+        end
+      end
+    end
+
+    it 'creates a KB preview token' do
+      expect { click('.icon-external') }
+        .to change { Token.exists?(action: 'KnowledgeBasePreview') }
+        .to(true)
     end
   end
 end

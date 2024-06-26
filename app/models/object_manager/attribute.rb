@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class ObjectManager::Attribute < ApplicationModel
   include HasDefaultModelUserRelations
@@ -22,8 +22,10 @@ class ObjectManager::Attribute < ApplicationModel
     integer
     autocompletion_ajax
     autocompletion_ajax_customer_organization
+    autocompletion_ajax_external_data_source
     boolean
     user_permission
+    group_permissions
     active
   ].freeze
 
@@ -40,6 +42,7 @@ class ObjectManager::Attribute < ApplicationModel
   validate :inactive_must_be_unused_by_references, unless: :active?
   validate :data_option_must_have_appropriate_values
   validate :data_type_must_not_change, on: :update
+  validate :json_field_only_on_postgresql, on: :create
 
   store :screens
   store :data_option
@@ -73,7 +76,7 @@ list of all attributes
 =end
 
   def self.list_full
-    result = ObjectManager::Attribute.all.reorder('position ASC, name ASC')
+    result = ObjectManager::Attribute.reorder('position ASC, name ASC')
     references = ObjectManager::Attribute.attribute_to_references_hash
     attributes = []
     result.each do |item|
@@ -105,7 +108,7 @@ add a new attribute entry for an object
     object: 'Ticket',
     name: 'group_id',
     display: __('Group'),
-    data_type: 'select',
+    data_type: 'tree_select',
     data_option: {
       relation: 'Group',
       relation_condition: { access: 'full' },
@@ -620,6 +623,8 @@ to send no browser reload event, pass false
       case attribute.data_type
       when %r{^(input|select|tree_select|richtext|textarea|checkbox)$}
         data_type = :string
+      when 'autocompletion_ajax_external_data_source'
+        data_type = :jsonb
       when %r{^(multiselect|multi_tree_select)$}
         data_type = if Rails.application.config.db_column_array
                       :string
@@ -654,6 +659,17 @@ to send no browser reload event, pass false
           if Rails.application.config.db_column_array
             options[:array] = true
           end
+
+          ActiveRecord::Migration.change_column(
+            model.table_name,
+            attribute.name,
+            data_type,
+            options,
+          )
+        when 'autocompletion_ajax_external_data_source'
+          options = {
+            null: true,
+          }
 
           ActiveRecord::Migration.change_column(
             model.table_name,
@@ -707,6 +723,16 @@ to send no browser reload event, pass false
           data_type,
           **options,
         )
+      when 'autocompletion_ajax_external_data_source'
+        options = {
+          null: true,
+        }
+        ActiveRecord::Migration.add_column(
+          model.table_name,
+          attribute.name,
+          data_type,
+          **options,
+        )
       when %r{^(integer|user_autocompletion)$}, %r{^(boolean|active)$}, %r{^(datetime|date)$}
         ActiveRecord::Migration.add_column(
           model.table_name,
@@ -728,6 +754,9 @@ to send no browser reload event, pass false
       reset_database_info(model)
       execute_db_count += 1
     end
+
+    # Clear caches so new attribute defaults can be set (#5075)
+    Rails.cache.clear
 
     # sent maintenance message to clients
     if send_event
@@ -927,6 +956,8 @@ is certain attribute used by triggers, overviews or schedulers
     when %r{^((multi|tree_)?select|checkbox)$}
       local_data_option[:nulloption] = true if local_data_option[:nulloption].nil?
       local_data_option[:maxlength] ||= 255
+    when 'autocompletion_ajax_external_data_source'
+      local_data_option[:nulloption] = true if local_data_option[:nulloption].nil?
     end
   end
 
@@ -953,6 +984,13 @@ is certain attribute used by triggers, overviews or schedulers
     return if (data_type_change - allowable_changes).empty?
 
     errors.add(:data_type, __("can't be altered after creation (you can delete the attribute and create another with the desired value)"))
+  end
+
+  def json_field_only_on_postgresql
+    return if data_type != 'autocompletion_ajax_external_data_source'
+    return if ActiveRecord::Base.connection_db_config.configuration_hash[:adapter] == 'postgresql'
+
+    errors.add(:data_type, __('can only be created on postgresql databases'))
   end
 
   def local_data_option

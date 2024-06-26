@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { useTraverseOptions } from '#shared/composables/useTraverseOptions.ts'
@@ -144,7 +144,7 @@ const changeSecurityState = (method: EnumSecurityStateType) => {
   <div
     :id="`${context.node.name}-${context.formId}`"
     :class="context.classes.input"
-    class="flex h-auto flex-row gap-2"
+    class="flex h-auto flex-col gap-2"
   >
     <div
       v-if="securityMethods.length > 1"

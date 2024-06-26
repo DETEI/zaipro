@@ -6,7 +6,7 @@ class ChannelForm extends App.ControllerSubContent
     'change form.js-paramsDesigner': 'updateParamsDesigner'
     'keyup form.js-paramsDesigner': 'updateParamsDesigner'
     'change .js-formSetting input': 'toggleFormSetting'
-    'change .js-paramsSetting select': 'updateGroup'
+    'change .js-paramsSetting input': 'updateGroup'
 
   elements:
     '.js-code': 'code'
@@ -29,7 +29,7 @@ class ChannelForm extends App.ControllerSubContent
     ))
 
     group_id = App.Setting.get('form_ticket_create_group_id')
-    selection = App.UiElement.select.render(
+    selection = App.UiElement.tree_select.render(
       name: 'group_id'
       multiple: false
       null: false

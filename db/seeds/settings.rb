@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 Setting.create_if_not_exists(
   title:       __('Application secret'),
@@ -340,7 +340,7 @@ Setting.create_if_not_exists(
   title:       __('Storage Mechanism'),
   name:        'storage_provider',
   area:        'System::Storage',
-  description: __('"Database" stores all attachments in the database (not recommended for storing large amounts of data). "Filesystem" stores the data in the filesystem. You can switch between the modules even on a system that is already in production without any loss of data.'),
+  description: __('"Database" stores all attachments in the database (not recommended for storing large amounts of data). "Filesystem" stores the data in the filesystem. "Simple Storage (S3)" stores the data in a remote S3 compatible object filesystem. You can switch between the modules even on a system that is already in production without any loss of data.'),
   options:     {
     form: [
       {
@@ -348,10 +348,10 @@ Setting.create_if_not_exists(
         null:      true,
         name:      'storage_provider',
         tag:       'select',
-        tranlate:  true,
         options:   {
           'DB'   => __('Database'),
           'File' => __('Filesystem'),
+          'S3'   => __('Simple Storage (S3)'),
         },
         translate: true,
       },
@@ -362,6 +362,7 @@ Setting.create_if_not_exists(
     controller:             'SettingsAreaStorageProvider',
     online_service_disable: true,
     permission:             ['admin.system'],
+    validations:            ['Setting::Validation::StorageProvider'],
   },
   frontend:    false
 )
@@ -1867,6 +1868,7 @@ Setting.create_if_not_exists(
         name:        'idp_sso_target_url',
         tag:         'input',
         placeholder: 'https://capriza.github.io/samling/samling.html',
+        required:    true,
       },
       {
         display:     __('IDP Single Logout target URL'),
@@ -1874,6 +1876,7 @@ Setting.create_if_not_exists(
         name:        'idp_slo_service_url',
         tag:         'input',
         placeholder: 'https://capriza.github.io/samling/slo.html',
+        required:    true,
       },
       {
         display:     __('IDP certificate'),
@@ -1881,6 +1884,7 @@ Setting.create_if_not_exists(
         name:        'idp_cert',
         tag:         'textarea',
         placeholder: '-----BEGIN CERTIFICATE-----\n...-----END CERTIFICATE-----',
+        required:    true,
       },
       {
         display:     __('IDP certificate fingerprint'),
@@ -1888,6 +1892,7 @@ Setting.create_if_not_exists(
         name:        'idp_cert_fingerprint',
         tag:         'input',
         placeholder: 'E7:91:B2:E1:...',
+        help:        __('Please note that this attribute is deprecated within one of the next versions of Zammad. Use the IDP certificate instead.'),
       },
       {
         display:     __('Name Identifier Format'),
@@ -1895,6 +1900,7 @@ Setting.create_if_not_exists(
         name:        'name_identifier_format',
         tag:         'input',
         placeholder: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+        required:    true,
       },
       {
         display:     __('UID Attribute Name'),
@@ -1903,6 +1909,52 @@ Setting.create_if_not_exists(
         tag:         'input',
         placeholder: '',
         help:        __('Attribute that uniquely identifies the user. If unset, the name identifier returned by the IDP is used.')
+      },
+      {
+        display: 'SSL verification',
+        name:    'ssl_verify',
+        tag:     'boolean',
+        options: {
+          true  => 'yes',
+          false => 'no',
+        },
+        default: true,
+        help:    __('Turning off SSL verification is a security risk and should be used only temporary. Use this option at your own risk!'),
+      },
+      {
+        display: __('Signing & Encrypting'),
+        null:    true,
+        name:    'security',
+        tag:     'select',
+        options: {
+          'off'     => __('None'),
+          'on'      => __('Signing & Encrypting'),
+          'sign'    => __('Only Signing'),
+          'encrypt' => __('Only Encrypting'),
+        },
+      },
+      {
+        display:     __('Certificate (PEM)'),
+        null:        true,
+        name:        'certificate',
+        tag:         'textarea',
+        placeholder: '-----BEGIN CERTIFICATE-----\n...-----END CERTIFICATE-----',
+      },
+      {
+        display:     __('Private key (PEM)'),
+        null:        true,
+        name:        'private_key',
+        tag:         'textarea',
+        placeholder: '-----BEGIN RSA PRIVATE KEY-----\n...-----END RSA PRIVATE KEY-----', # gitleaks:allow
+      },
+      {
+        display:     __('Private key secret'),
+        null:        true,
+        name:        'private_key_secret',
+        tag:         'input',
+        type:        'password',
+        single:      true,
+        placeholder: '',
       },
       {
         display:  __('Your callback URL'),
@@ -1915,7 +1967,12 @@ Setting.create_if_not_exists(
   },
   state:       {},
   preferences: {
-    permission: ['admin.security'],
+    permission:  ['admin.security'],
+    validations: [
+      'Setting::Validation::Saml::RequiredAttributes',
+      'Setting::Validation::Saml::TLS',
+      'Setting::Validation::Saml::Security',
+    ],
   },
   frontend:    false
 )
@@ -2799,7 +2856,7 @@ Setting.create_if_not_exists(
         display:  '',
         null:     true,
         name:     'group_ids',
-        tag:      'multiselect',
+        tag:      'tree_select',
         multiple: true,
         relation: 'Group',
       },
@@ -3459,6 +3516,15 @@ Setting.create_if_not_exists(
   area:        'SearchIndex::Elasticsearch',
   description: __('Defines Elasticsearch index name.'),
   state:       'zammad',
+  preferences: { online_service_disable: true },
+  frontend:    false
+)
+Setting.create_if_not_exists(
+  title:       __('Elasticsearch SSL verification'),
+  name:        'es_ssl_verify',
+  area:        'SearchIndex::Elasticsearch',
+  description: __('Defines Elasticsearch SSL verification.'),
+  state:       true,
   preferences: { online_service_disable: true },
   frontend:    false
 )

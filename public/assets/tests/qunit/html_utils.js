@@ -1525,6 +1525,17 @@ QUnit.test("check replace tags", assert => {
   verify = App.Utils.replaceTags(message, data)
   assert.equal(verify, result)
 
+  message = "<div>issue #4973 #{user,firstname}</div>"
+  result = '<div>issue #4973 -</div>'
+  data = {
+    user: {
+      firstname: 'Bob',
+      lastname: 'Smith',
+    },
+  }
+  verify = App.Utils.replaceTags(message, data)
+  assert.equal(verify, result)
+
   user = new App.User({
     firstname: 'Bob',
     lastname: 'Smith Good',
@@ -1560,6 +1571,45 @@ QUnit.test("check replace tags", assert => {
     user: user
   }
   verify = App.Utils.replaceTags(message, data, true)
+  assert.equal(verify, result)
+
+  var attribute_external_source = {
+    name: 'external_data_source', display: 'external_data_source',  tag: 'autocompletion_ajax_external_data_source', null: true
+  };
+  App.Ticket.configure_attributes.push( attribute_external_source )
+  message = "<a href=\"https://example.co/product/#{ticket.external_data_source}\">some text</a>"
+  result  = '<a href=\"https://example.co/product/1234">some text</a>'
+  data    = {
+    ticket: {
+      external_data_source: {
+        value: 1234,
+        label: 'Example Label'
+      }
+    }
+  }
+  verify = App.Utils.replaceTags(message, data, true)
+  assert.equal(verify, result)
+
+  message = "<div>#{user.avatar(100, 100)}</div>"
+  result  = '<div></div>'
+  data    = {
+    user: user
+  }
+  verify = App.Utils.replaceTags(message, data)
+  assert.equal(verify, result)
+
+  user = new App.User({
+    firstname: 'Bob',
+    lastname: 'Smith Good',
+    created_at: '2018-10-31T10:00:00Z',
+    image: '808d0f10f81c8b1117608cb22a73076e'
+  })
+  message = "<div>#{user.avatar(100, 100)}</div>"
+  result  = '<div><img src="api/v1/users/image/' + user.image +  '" width="100" height="100" data-user-avatar="true" /></div>'
+  data    = {
+    user: user
+  }
+  verify = App.Utils.replaceTags(message, data)
   assert.equal(verify, result)
 });
 
@@ -2447,7 +2497,6 @@ QUnit.test('check getRecipientArticle format', assert => {
     in_reply_to: 'message_id7',
   }
   verify = App.Utils.getRecipientArticle(ticket, article, article.created_by, article.type)
-  console.log(verify)
   assert.deepEqual(verify, result)
 
   customer = {

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Channel::Driver::Sms::Twilio < Channel::Driver::Sms::Base
   NAME = 'sms/twilio'.freeze
@@ -104,7 +104,7 @@ class Channel::Driver::Sms::Twilio < Channel::Driver::Sms::Base
         { name: 'options::account_id', display: __('Account SID'), tag: 'input', type: 'text', limit: 200, null: false, placeholder: 'XXXXXX' },
         { name: 'options::token', display: __('Token'), tag: 'input', type: 'text', limit: 200, null: false },
         { name: 'options::sender', display: __('Sender'), tag: 'input', type: 'text', limit: 200, null: false, placeholder: '+491710000000' },
-        { name: 'group_id', display: __('Destination Group'), tag: 'select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
+        { name: 'group_id', display: __('Destination Group'), tag: 'tree_select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
       ],
       notification: [
         { name: 'options::account_id', display: __('Account SID'), tag: 'input', type: 'text', limit: 200, null: false, placeholder: 'XXXXXX' },

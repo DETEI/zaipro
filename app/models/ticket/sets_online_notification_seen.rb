@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # Schedules a background job to update the user's ticket seen information on ticket changes.
 module Ticket::SetsOnlineNotificationSeen
@@ -21,7 +21,7 @@ module Ticket::SetsOnlineNotificationSeen
     return false if saved_changes['state_id'].blank?
 
     # check if existing online notifications for this ticket should be set to seen
-    return true if !online_notification_seen_state
+    return true if !OnlineNotification.seen_state?(self)
 
     # set all online notifications to seen
     # send background job

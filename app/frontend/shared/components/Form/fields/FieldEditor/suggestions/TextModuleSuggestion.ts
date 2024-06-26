@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import Mention from '@tiptap/extension-mention'
 
@@ -24,6 +24,7 @@ export default (context: Ref<FormFieldContext<FieldEditorProps>>) => {
 
   const getTextModules = async (query: string) => {
     const { meta: editorMeta = {}, formId } = context.value
+
     const meta = editorMeta[PLUGIN_NAME] || {}
     let { ticketId, customerId } = context.value
 

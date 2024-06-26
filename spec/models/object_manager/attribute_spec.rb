@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -543,6 +543,25 @@ RSpec.describe ObjectManager::Attribute, type: :model do
 
       it 'raises an error' do
         expect { described_class.add(attribute) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    context 'when adding a json field' do
+      let(:expected_attributes) do
+        {
+          data_type: 'autocompletion_ajax_external_data_source',
+          active:    true,
+        }
+      end
+      let(:attribute) { create(:object_manager_attribute_autocompletion_ajax_external_data_source) }
+
+      it 'works on postgresql', db_adapter: :postgresql do
+        expect { attribute }.to change(described_class, :count)
+        expect(attribute).to have_attributes(expected_attributes)
+      end
+
+      it 'fails on mysql', db_adapter: :mysql do
+        expect { attribute }.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: Data type can only be created on postgresql databases')
       end
     end
   end

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -54,7 +54,7 @@ RSpec.describe 'Overview', type: :system do
 
       find('[name=title]').fill_in with: 'Title'
       find(:richtext).send_keys 'content'
-      find('[name=group_id]').select Group.first.name
+      set_tree_select_value('group_id', Group.first.name)
       click '.js-submit'
 
       perform_enqueued_jobs only: TicketUserTicketCounterJob
@@ -146,6 +146,26 @@ RSpec.describe 'Overview', type: :system do
       it 'sorts groups a > b > c' do
         within :active_content do
           expect(all('.table-overview table b').map(&:text)).to eq %w[aaa bbb ccc]
+        end
+      end
+
+      it 'updates table grouping when updated using bulk update' do
+        find("tr[data-id='#{ticket1.id}']").check('bulk', allow_label_click: true)
+        find("tr[data-id='#{ticket2.id}']").check('bulk', allow_label_click: true)
+        find("tr[data-id='#{ticket3.id}']").check('bulk', allow_label_click: true)
+
+        find('[data-attribute-name="group_id"]').click
+        find('li', text: 'aaa').click
+
+        click '.js-confirm'
+        find('.js-confirm-step textarea').fill_in with: 'test tickets grouping'
+        click '.js-submit'
+
+        within :active_content do
+          expect(page)
+            .to have_text('aaa')
+            .and have_no_text('bbb')
+            .and have_no_text('ccc')
         end
       end
     end
@@ -248,7 +268,7 @@ RSpec.describe 'Overview', type: :system do
     end
   end
 
-  context 'when multiselect is choosen as column', authenticated_as: :authenticate, db_strategy: :reset, mariadb: true do
+  context 'when multiselect is choosen as column', authenticated_as: :authenticate, db_strategy: :reset do
     def authenticate
       create(:object_manager_attribute_multiselect, data_option: data_option, name: attribute_name)
       ObjectManager::Attribute.migration_execute
@@ -297,7 +317,7 @@ RSpec.describe 'Overview', type: :system do
 
       it "shows dash '-' for tickets" do
         within :active_content, overview_table_selector do
-          expect(page).to have_selector 'tr.item td', text: expected_text
+          expect(page).to have_css 'tr.item td', text: expected_text
         end
       end
     end
@@ -308,7 +328,7 @@ RSpec.describe 'Overview', type: :system do
 
       it 'shows the display value for tickets' do
         within :active_content, overview_table_selector do
-          expect(page).to have_selector 'tr.item td', text: expected_text
+          expect(page).to have_css 'tr.item td', text: expected_text
         end
       end
     end
@@ -319,7 +339,7 @@ RSpec.describe 'Overview', type: :system do
 
       it 'shows comma seperated diaplay value for tickets' do
         within :active_content, overview_table_selector do
-          expect(page).to have_selector 'tr.item td', text: expected_text
+          expect(page).to have_css 'tr.item td', text: expected_text
         end
       end
     end

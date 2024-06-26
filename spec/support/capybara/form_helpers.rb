@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require_relative 'test_flags'
 
@@ -89,7 +89,7 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
   end
 
   # Returns identifier of the form field.
-  def field_id # rubocop:disable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
+  def field_id
     return element.find('.formkit-input', visible: :all)['id'] if input? || type_date? || type_datetime?
     return element.find('textarea')['id'] if type_textarea?
     return element.find('.formkit-fieldset')['id'] if type_radio?
@@ -314,7 +314,7 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
   #   find_datepicker('Date Picker').select_date(Date.today)
   #   find_datepicker('Date Picker').select_date('2023-01-01')
   #
-  def select_date(date, with_time: false) # rubocop:disable Metrics/CyclomaticComplexity
+  def select_date(date, with_time: false)
     raise 'Field does not support selecting dates' if !type_date? && !type_datetime?
 
     element.click
@@ -497,7 +497,7 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
   end
 
   def autocomplete?
-    type_autocomplete? || type_customer? || type_organization? || type_recipient?
+    type_autocomplete? || type_customer? || type_organization? || type_recipient? || type_externalDataSource?
   end
 
   # Input elements in supported fields define data attribute for "multiple" state.
@@ -792,6 +792,8 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
       wait_for_gql('shared/components/Form/fields/FieldOrganization/graphql/queries/autocompleteSearch/organization.graphql', number: gql_number)
     elsif type_recipient?
       wait_for_gql('shared/components/Form/fields/FieldRecipient/graphql/queries/autocompleteSearch/recipient.graphql', number: gql_number)
+    elsif type_externalDataSource?
+      wait_for_gql('shared/components/Form/fields/FieldExternalDataSource/graphql/queries/autocompleteSearchObjectAttributeExternalDataSource.graphql', number: gql_number)
     elsif type_tags?
       # NB: tags autocomplete query fires only once?!
       wait_for_gql('shared/entities/tags/graphql/queries/autocompleteTags.graphql', number: 1, skip_clearing: true)
@@ -807,6 +809,7 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
     return form_context.form_gql_number(:customer) if type_customer?
     return form_context.form_gql_number(:organization) if type_organization?
     return form_context.form_gql_number(:recipient) if type_recipient?
+    return form_context.form_gql_number(:externalDataSource) if type_externalDataSource?
 
     form_context.form_gql_number(:tags) if type_tags?
   end
@@ -831,15 +834,7 @@ class ZammadFormFieldCapybaraElementDelegator < SimpleDelegator
   end
 
   def clear_date
-    element.click
-
-    wait_for_test_flag("field-date-time-#{field_id}.opened")
-
-    element.find_button('Clear').click
-
-    close_date_picker(element)
-
-    wait_for_test_flag("field-date-time-#{field_id}.closed")
+    input_element.send_keys(:backspace)
 
     maybe_wait_for_form_updater
 

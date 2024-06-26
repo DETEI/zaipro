@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'telegram/bot'
 
@@ -224,7 +224,7 @@ returns
 
     locale = Locale.find_by(alias: language_code)
     if !locale
-      locale = Locale.where('locale LIKE :prefix', prefix: "#{language_code}%").first
+      locale = Locale.where('locale LIKE :prefix', prefix: "#{SqlHelper.quote_like(language_code)}%").first
     end
 
     if locale

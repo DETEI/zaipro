@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 /* eslint-disable zammad/zammad-detect-translatable-string */
@@ -14,6 +14,13 @@ import { computed, reactive, ref } from 'vue'
 import { EnumSecurityStateType } from '#shared/components/Form/fields/FieldSecurity/types.ts'
 
 const linkSchemaRaw = [
+  {
+    type: 'externalDataSource',
+    name: 'external_data_source',
+    label: 'External Data Source',
+    object: 'Ticket',
+    required: true,
+  },
   {
     type: 'security',
     name: 'security',
@@ -445,7 +452,6 @@ const logSubmit = console.log
 
     <CommonStepper v-model="currentStep" class="mx-20" :steps="steps" />
 
-    <!-- TODO where to put this? -->
     <button @click="openCreateUserDialog()">Create user</button>
 
     <Form id="form" :schema="editorSchema" @submit="logSubmit" />

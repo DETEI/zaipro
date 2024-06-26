@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { SetRequired } from 'type-fest'
 import { cloneDeep, keyBy } from 'lodash-es'
@@ -115,7 +115,6 @@ describe('Form - Field - Select - Dialog', () => {
     ).toHaveClass('font-semibold')
 
     expect(
-      // TODO should work just with view.getByIconName('mobile-check') with Vitest 0.19
       wrapper.getByIconName((name, node) => {
         return (
           name === '#icon-mobile-check' &&

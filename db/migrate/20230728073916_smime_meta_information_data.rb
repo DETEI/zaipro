@@ -1,13 +1,13 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class SMIMEMetaInformationData < ActiveRecord::Migration[6.1]
-  def change # rubocop:disable Metrics/AbcSize
+  def change
     # return if it's a new setup
     return if !Setting.exists?(name: 'system_init_done')
 
     SMIMECertificate.in_batches.each_record do |record|
       begin
-        cert = SecureMailing::SMIME::Certificate.new(record.pem)
+        cert = Certificate::X509::SMIME.new(record.pem)
         data = {
           email_addresses: cert.email_addresses,
           issuer_hash:     cert.issuer.hash.to_s(16),

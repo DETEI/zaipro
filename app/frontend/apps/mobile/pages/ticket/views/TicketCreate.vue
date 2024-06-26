@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from 'vue'
@@ -47,6 +47,7 @@ import { useDialog } from '#shared/composables/useDialog.ts'
 import { useStickyHeader } from '#shared/composables/useStickyHeader.ts'
 import type { ApolloError } from '@apollo/client'
 import { waitForConfirmation } from '#shared/utils/confirmation.ts'
+import { useUserQuery } from '#mobile/entities/user/graphql/queries/user.api.ts'
 import { useTicketCreateMutation } from '../graphql/mutations/create.api.ts'
 
 const router = useRouter()
@@ -167,6 +168,41 @@ const ticketArticleTypeSection = getFormSchemaGroupSection(
   true,
 )
 
+const locationParams = new URL(window.location.href).searchParams
+const customUserId = locationParams.get('customer_id') || undefined
+
+const userOptions = ref<unknown[]>([])
+
+const userQuery = useUserQuery(
+  () => ({
+    userInternalId: Number(customUserId),
+    secondaryOrganizationsCount: 3,
+  }),
+  {
+    // we probably opened this because user was already loaded user on another page,
+    // so we should try to get it from cache first, but if someone passed down id
+    // we need to still provide correct value
+    fetchPolicy: 'cache-first',
+    enabled: !!customUserId,
+  },
+)
+userQuery.onResult((r) => {
+  if (r.loading) return
+  const user = r.data?.user
+  if (!user) {
+    userOptions.value = []
+    return
+  }
+  userOptions.value = [
+    {
+      value: user.internalId,
+      label: user.fullname || user.phone,
+      heading: user.organization?.name,
+      user,
+    },
+  ]
+})
+
 const ticketMetaInformationSection = getFormSchemaGroupSection(
   'ticketMetaInformation',
   __('Additional information'),
@@ -181,6 +217,15 @@ const ticketMetaInformationSection = getFormSchemaGroupSection(
           value: {
             count: 0,
             items: [],
+          },
+        },
+        {
+          screen: 'create_top',
+          object: EnumObjectManagerObjects.Ticket,
+          name: 'customer_id',
+          value: customUserId ? Number(customUserId) : undefined,
+          props: {
+            options: userOptions,
           },
         },
         {

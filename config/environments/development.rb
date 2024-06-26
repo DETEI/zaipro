@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -52,9 +52,6 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
-  # Raises error for missing translations.
-  # config.action_view.raise_on_missing_translations = true
-
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = if ENV['DEVELOPMENT_FILE_WATCHER'] == 'file_update_checker'
@@ -71,9 +68,6 @@ Rails.application.configure do
   # Checks for improperly declared sprockets dependencies.
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
-
-  # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
 
   # TODO: New in Rails 6
   # See https://www.fngtps.com/2019/rails6-blocked-host/

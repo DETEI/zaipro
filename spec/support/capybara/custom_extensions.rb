@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Capybara::Node::Element
 
@@ -90,6 +90,12 @@ module ZammadCapybarActionDelegator
     end
   end
 
+  def fill_in(...)
+    super.tap do
+      await_empty_ajax_queue
+    end
+  end
+
   def hot_keys
     mac_platform? ? %i[control alt] : %i[shift control]
   end
@@ -100,6 +106,12 @@ module ZammadCapybarActionDelegator
 
   def mac_platform?
     Gem::Platform.local.os.eql? 'darwin'
+  end
+
+  def check(...)
+    super.tap do
+      await_empty_ajax_queue
+    end
   end
 end
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { TicketCount } from '#shared/graphql/types.ts'
 
@@ -14,7 +14,7 @@ export const useUsersTicketsCount = () => {
     return {
       count: user.ticketsCount,
       createLabel: __('Create new ticket for this user'),
-      createLink: `/tickets/create?user_id=${user.internalId}`,
+      createLink: `/tickets/create?customer_id=${user.internalId}`,
       query: `customer.id: ${user.internalId}`,
     }
   }

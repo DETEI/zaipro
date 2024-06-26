@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -308,6 +308,8 @@ RSpec.describe 'Expert conditions in Manage > Overviews', type: :system do
       let(:object) { create(object_name.to_sym, condition: condition) }
 
       before do
+        object
+
         visit path
 
         within ".table-#{object_name} .js-tableBody" do
@@ -641,6 +643,8 @@ RSpec.describe 'Expert conditions in Manage > Overviews', type: :system do
       let(:object) { create(object_name.to_sym, condition: condition) }
 
       before do
+        object
+
         visit path
 
         within ".table-#{object_name} .js-tableBody" do
@@ -677,7 +681,7 @@ RSpec.describe 'Expert conditions in Manage > Overviews', type: :system do
         it 'shows an alert that a data loss may occur upon save' do
           within '.ticket_selector' do
             check_condition(1, 'Title', 'contains', value_input: 'l')
-            expect(self).to have_selector('.js-alert')
+            expect(self).to have_css('.js-alert')
           end
         end
       end

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class MoveAuthBackendsToDatabase < ActiveRecord::Migration[6.0]
   def change
@@ -44,7 +44,7 @@ class MoveAuthBackendsToDatabase < ActiveRecord::Migration[6.0]
 
   private
 
-  def update_auth_ldap # rubocop:disable Metrics/AbcSize
+  def update_auth_ldap
 
     begin
       auth_ldap = Setting.find_by(name: 'auth_ldap')

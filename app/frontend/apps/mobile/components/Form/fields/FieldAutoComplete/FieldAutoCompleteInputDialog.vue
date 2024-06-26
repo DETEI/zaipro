@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import type { ConcreteComponent, Ref } from 'vue'
@@ -21,6 +21,7 @@ import useSelectOptions from '#shared/composables/useSelectOptions.ts'
 import type {
   AutoCompleteOption,
   AutoCompleteProps,
+  AutocompleteSelectValue,
 } from '#shared/components/Form/fields/FieldAutocomplete/types.ts'
 import FieldAutoCompleteOptionIcon from './FieldAutoCompleteOptionIcon.vue'
 
@@ -34,7 +35,7 @@ const props = defineProps<{
 
 const contextReactive = toRef(props, 'context')
 
-const { isCurrentValue } = useValue(contextReactive)
+const { isCurrentValue } = useValue<AutocompleteSelectValue>(contextReactive)
 
 const emit = defineEmits<{
   (e: 'updateOptions', options: AutoCompleteOption[]): void
@@ -101,9 +102,14 @@ const AutocompleteSearchDocument = gql`
   ${props.context.gqlQuery}
 `
 
-// TODO: Check the cache policy for this query, because already triggered searches are re-used from the cache and if
-//   the source was changed in the meantime, the result will not be updated. It's unclear if there is a subscription in
-//   place to update the result on any changes.
+const additionalQueryParams = () => {
+  if (typeof props.context.additionalQueryParams === 'function') {
+    return props.context.additionalQueryParams()
+  }
+
+  return props.context.additionalQueryParams || {}
+}
+
 const autocompleteQueryHandler = new QueryHandler(
   useLazyQuery(
     AutocompleteSearchDocument,
@@ -111,11 +117,12 @@ const autocompleteQueryHandler = new QueryHandler(
       input: {
         query: debouncedFilter.value || props.context.defaultFilter || '',
         limit: props.context.limit,
-        ...(props.context.additionalQueryParams || {}),
+        ...(additionalQueryParams() || {}),
       },
     }),
     () => ({
       enabled: !!(debouncedFilter.value || props.context.defaultFilter),
+      cachePolicy: 'no-cache', // Do not use cache, because we want always up-to-date results.
     }),
   ),
 )
@@ -249,17 +256,21 @@ useTraverseOptions(autocompleteList)
       </CommonButton>
     </template>
     <template #after-label>
-      <CommonIcon
+      <button
         v-if="context.action || context.onActionClick"
-        :name="context.actionIcon ? context.actionIcon : 'mobile-external-link'"
-        :label="context.actionLabel"
-        class="cursor-pointer text-white"
-        size="base"
         tabindex="0"
-        role="button"
+        :aria-label="context.actionLabel"
         @click="executeAction"
         @keypress.space="executeAction"
-      />
+      >
+        <CommonIcon
+          :name="
+            context.actionIcon ? context.actionIcon : 'mobile-external-link'
+          "
+          class="cursor-pointer text-white"
+          size="base"
+        />
+      </button>
       <CommonButton
         v-else
         class="grow"
@@ -349,8 +360,6 @@ useTraverseOptions(autocompleteList)
           >
             <span>{{ (option as AutoCompleteOption).heading }}</span>
           </span>
-          <!-- since it has fixed height, we add ellipsis on the first line -->
-          <!-- TODO: should it be fixed? or we should allow multiline with maximum lines (3?) -->
           <span
             :class="{
               'opacity-30': option.disabled,

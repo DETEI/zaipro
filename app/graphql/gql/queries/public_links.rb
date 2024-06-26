@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Queries
   class PublicLinks < BaseQuery
@@ -14,7 +14,7 @@ module Gql::Queries
     end
 
     def resolve(screen:)
-      PublicLink.all.select { |link| link[:screen].include?(screen) }
+      PublicLink.select { |link| link[:screen].include?(screen) }
     end
   end
 end

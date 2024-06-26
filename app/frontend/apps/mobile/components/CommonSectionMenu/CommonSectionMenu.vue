@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
@@ -66,7 +66,7 @@ const showLabel = computed(() => {
   </div>
   <div
     v-if="itemsWithPermission || $slots.default || $slots['before-items']"
-    class="flex w-full flex-col rounded-xl bg-gray-500 px-3 py-1 text-base text-white"
+    class="flex w-full flex-col rounded-xl bg-gray-500 overflow-hidden text-base text-white"
     :class="{ 'mb-6': !hasHelp }"
     v-bind="$attrs"
   >

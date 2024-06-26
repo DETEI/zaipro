@@ -1,9 +1,10 @@
+# No usage of a ControllerObserver here because we want to use
+# the data of the ticket zoom ajax request which is using the all=true parameter
+# and contain the core workflow information as well. Without observer we also
+# dont have double rendering because of the zoom (all=true) and observer (full=true) render callback
 class Edit extends App.Controller
   constructor: (params) ->
     super
-    @ticket_id = null
-    @csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    @jwtToken = localStorage.getItem('jwtToken')
     @controllerBind('ui::ticket::load', (data) =>
       return if data.ticket_id.toString() isnt @ticket.id.toString()
 
@@ -51,7 +52,6 @@ class Edit extends App.Controller
 
     # set updated_at for the sidbar because we render a new state
     @el.attr('data-ticket-updated-at', defaults.updated_at)
-    console.log defaults.updated_at
     @markForm(true)
 
     return if @resetBind
@@ -66,15 +66,13 @@ class Edit extends App.Controller
     @controllerBind('ui::ticket::taskReset', (data) =>
       return if data.ticket_id.toString() isnt @ticket.id.toString()
       @render()
-    ) 
+    )
 
   isDisabledByFollowupRules: (attributes) =>
     return false if @ticket.userGroupAccess('change')
 
     group           = App.Group.find(attributes.group_id)
     ticketStateType = App.TicketState.find(attributes.state_id).name
-    if ticketStateType == 'closed'
-      @getTicketById(@ticket.id)
     initialState    = !@ticket.editable()
 
     return initialState if ticketStateType isnt 'closed'
@@ -88,72 +86,6 @@ class Edit extends App.Controller
         closed_since = (new Date - Date.parse(@ticket.last_close_at)) / (24 * 60 * 60 * 1000)
 
         return closed_since >= group.reopen_time_in_days
-
-  # Localizar el evento del botón para abrir el formulario del feedback
-  document.addEventListener 'DOMContentLoaded', ->
-    feedbackButton = document.getElementById('feedbackButton')
-    feedbackButton?.addEventListener 'click', handleFeedbackClick
-
-    # Agregar evento para envío del formulario
-    feedbackForm = document.getElementById('feedbackForm')
-    feedbackForm?.addEventListener 'submit', handleFeedbackFormSubmit
-
-  # Consultar el ticket
-  getTicketById: (ticket_id) =>
-    fetch "/api/v1/tickets/#{ticket_id}",
-      method: 'GET'
-      headers:
-        'Content-Type': 'application/json'
-    .then (response) =>
-      unless response.ok
-        throw new Error 'Network response was not ok'
-      response.json()
-    .then (data) =>
-      console.log 'Ticket data:', data
-      @ticket_id = data.id
-      console.log 'ID: ', @ticket_id
-    .catch (error) =>
-      console.error 'There was a problem with the fetch operation:', error
-
-  window.handleFeedbackClick = ->
-    console.log 'Me presionan'
-    $('.feedback_modal').show()
-
-  # Manejar el envío del formulario de feedback
-  handleFeedbackFormSubmit = (event) ->
-    event.preventDefault()
-
-    tikedID = document.getElementById('ticket_id').value
-    problemSolved = document.getElementById('problem_solved').value
-    advisorRating = document.getElementById('advisor_rating').value
-    comments = document.getElementById('comments').value
-
-    console.log 'ticket ID: ', tikedID
-    data =
-      ticket_id: tikedID
-      problem_solved: problemSolved
-      advisor_rating: advisorRating
-      comments: comments
-
-    url = "/api/v1/tickets/#{ticket_id}"
-    queryParams = new URLSearchParams(data).toString()
-    fullUrl = "#{url}?#{queryParams}"
-
-    fetch fullUrl,
-      method: 'GET'
-      headers:
-        'Content-Type': 'application/json'
-    .then (response) =>
-      unless response.ok
-        throw new Error 'Network response was not ok'
-      response.json()
-    .then (data) =>
-      console.log 'Ticket data:', data
-      document.querySelector('.feedback_modal').style.display = 'none'
-      document.querySelector('#feedbackButton').style.display = 'none'
-      alert 'Gracias por tu feedback!'
-    .catch (error) =>
-      console.error 'There was a problem with the fetch operation:', error
 
 class SidebarTicket extends App.Controller
   constructor: ->

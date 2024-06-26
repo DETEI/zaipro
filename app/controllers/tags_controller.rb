@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class TagsController < ApplicationController
   prepend_before_action :authenticate_and_authorize!
@@ -33,6 +33,8 @@ class TagsController < ApplicationController
 
   # POST /api/v1/tags/add
   def add
+    raise Exceptions::Forbidden if !::Tag.tag_allowed?(name: params[:item], user_id: UserInfo.current_user_id)
+
     success = Tag.tag_add(
       object: params[:object],
       o_id:   params[:o_id],
@@ -102,6 +104,6 @@ class TagsController < ApplicationController
       return Tag::Item.left_outer_joins(:tags).group(:id).reorder('COUNT(tags.tag_item_id) DESC, name ASC').limit(limit)
     end
 
-    Tag::Item.where('name_downcase LIKE ?', "%#{term.strip.downcase}%").reorder(name: :asc).limit(limit)
+    Tag::Item.where('name_downcase LIKE ?', "%#{SqlHelper.quote_like(term.strip.downcase)}%").reorder(name: :asc).limit(limit)
   end
 end

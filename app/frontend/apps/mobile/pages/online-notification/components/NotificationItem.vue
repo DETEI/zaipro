@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import ActivityMessage from '#shared/components/ActivityMessage/ActivityMessage.vue'
@@ -6,7 +6,7 @@ import type {
   ActivityMessageMetaObject,
   Scalars,
 } from '#shared/graphql/types.ts'
-import type { AvatarUser } from '#shared/components/CommonUserAvatar/index.ts'
+import type { AvatarUser } from '#shared/components/CommonUserAvatar/types.ts'
 import { MutationHandler } from '#shared/server/apollo/handler/index.ts'
 import type { ApolloCache, InMemoryCache } from '@apollo/client'
 import { useOnlineNotificationDeleteMutation } from '#shared/entities/online-notification/graphql/mutations/delete.api.ts'

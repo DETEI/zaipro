@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class ImportKayakoController < ApplicationController
   def url_check
@@ -27,7 +27,7 @@ class ImportKayakoController < ApplicationController
     }
   end
 
-  def credentials_check # rubocop:disable Metrics/AbcSize
+  def credentials_check
     return if setup_done_response
 
     if !params[:username] || !params[:password]
@@ -74,7 +74,7 @@ class ImportKayakoController < ApplicationController
   private
 
   def setup_done
-    count = User.all.count
+    count = User.count
     done = true
     if count <= 2
       done = false

@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import type { FormFieldContext } from '#shared/components/Form/types/field.ts'
@@ -145,7 +145,7 @@ const editor = useEditor({
       role: 'textbox',
       name: props.context.node.name,
       id: props.context.id,
-      class: 'min-h-[80px]',
+      class: props.context.classes.input,
       'data-value': editorValue.value,
     },
     // add inlined files
@@ -211,7 +211,7 @@ watch(
           role: 'textbox',
           name: props.context.node.name,
           id,
-          class: 'min-h-[80px]',
+          class: props.context.classes.input,
           'data-value': value,
         },
       },

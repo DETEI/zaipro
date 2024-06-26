@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import type {
@@ -21,7 +21,7 @@ export interface TicketInformation {
   form: ShallowRef<FormRef | undefined>
   updateFormLocation: (newLocation: string) => void
   canUpdateTicket: ComputedRef<boolean>
-  showArticleReplyDialog: () => void
+  showArticleReplyDialog: () => Promise<void>
   liveUserList?: Ref<TicketLiveAppUser[]>
   refetchingStatus: Ref<boolean>
   newArticlesIds: Set<string>

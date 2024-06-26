@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Transaction::Notification
   include ChecksHumanChanges
@@ -133,7 +133,7 @@ class Transaction::Notification
           history_type_id:   History.type_lookup('notification').id,
           history_object_id: History.object_lookup('Ticket').id,
           o_id:              ticket.id
-        ).where('created_at > ?', already_notified_cutoff).exists?(['value_to LIKE ?', "%#{identifier}(#{@item[:type]}:%"])
+        ).where('created_at > ?', already_notified_cutoff).exists?(['value_to LIKE ?', "%#{SqlHelper.quote_like(identifier)}(#{SqlHelper.quote_like(@item[:type])}:%"])
 
         next if already_notified
       end
@@ -161,7 +161,7 @@ class Transaction::Notification
         elsif @item[:type] != 'create' && (@item[:changes].blank? || @item[:changes]['state_id'].blank?)
           seen = false
         else
-          seen = ticket.online_notification_seen_state(user.id)
+          seen = OnlineNotification.seen_state?(ticket, user.id)
         end
 
         OnlineNotification.add(
@@ -225,7 +225,7 @@ class Transaction::Notification
           changes:      changes,
           reason:       recipients_reason[user.id],
         },
-        message_id:  "<notification.#{DateTime.current.to_s(:number)}.#{ticket.id}.#{user.id}.#{SecureRandom.uuid}@#{Setting.get('fqdn')}>",
+        message_id:  "<notification.#{DateTime.current.to_fs(:number)}.#{ticket.id}.#{user.id}.#{SecureRandom.uuid}@#{Setting.get('fqdn')}>",
         references:  ticket.get_references,
         main_object: ticket,
         attachments: attachments,

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # Be sure to restart your server when you modify this file.
 
@@ -26,4 +26,6 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'GitHub'
   inflect.acronym 'PGP'
   inflect.acronym 'SMIME'
+  inflect.acronym 'SSL'
+  inflect.acronym 'TLS'
 end

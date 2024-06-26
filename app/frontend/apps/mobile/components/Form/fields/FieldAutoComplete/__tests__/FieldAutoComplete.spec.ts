@@ -1,14 +1,20 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { cloneDeep, escapeRegExp } from 'lodash-es'
 import { getByText, waitFor } from '@testing-library/vue'
 import { getNode } from '@formkit/core'
 import { FormKit } from '@formkit/vue'
-import { provideApolloClient } from '@vue/apollo-composable'
-import { createMockClient } from 'mock-apollo-client'
+import {
+  mockGraphQLApi,
+  type MockGraphQLInstance,
+} from '#tests/support/mock-graphql-api.ts'
 import { renderComponent } from '#tests/support/components/index.ts'
 import { i18n } from '#shared/i18n.ts'
-import { nullableMock, waitForNextTick } from '#tests/support/utils.ts'
+import {
+  nullableMock,
+  waitForNextTick,
+  waitUntil,
+} from '#tests/support/utils.ts'
 import { getByIconName } from '#tests/support/components/iconQueries.ts'
 import type { ObjectLike } from '#shared/types/utils.ts'
 import type { AutocompleteSearchUserQuery } from '#shared/graphql/types.ts'
@@ -73,22 +79,6 @@ const mockQueryResult = (input: {
   return {
     autocompleteSearchUser: filteredOptions.slice(0, input.limit ?? 25),
   }
-}
-
-// TODO: can maybe be replaced with existing helper function?
-const mockClient = () => {
-  const mockApolloClient = createMockClient()
-
-  mockApolloClient.setRequestHandler(
-    AutocompleteSearchUserDocument,
-    (variables) => {
-      return Promise.resolve({
-        data: mockQueryResult(variables.input),
-      })
-    },
-  )
-
-  provideApolloClient(mockApolloClient)
 }
 
 const wrapperParameters = {
@@ -181,7 +171,17 @@ describe('Form - Field - AutoComplete - Dialog', () => {
 })
 
 describe('Form - Field - AutoComplete - Query', () => {
-  mockClient()
+  let mockApi: MockGraphQLInstance
+
+  beforeEach(() => {
+    mockApi = mockGraphQLApi(AutocompleteSearchUserDocument).willBehave(
+      (variables) => {
+        return {
+          data: mockQueryResult(variables.input),
+        }
+      },
+    )
+  })
 
   it('fetches remote options via GraphQL query', async () => {
     const wrapper = renderComponent(FormKit, {
@@ -206,6 +206,8 @@ describe('Form - Field - AutoComplete - Query', () => {
     expect(
       wrapper.queryByText('Start typing to search…'),
     ).not.toBeInTheDocument()
+
+    await waitUntil(() => mockApi.calls.behave)
 
     let selectOptions = wrapper.getAllByRole('option')
 
@@ -348,6 +350,98 @@ describe('Form - Field - AutoComplete - Query', () => {
       getByIconName(selectOptions[1], 'mobile-check-box-yes'),
     ).toBeInTheDocument()
   })
+
+  it('supports storing complex non-multiple values', async () => {
+    const wrapper = renderComponent(FormKit, {
+      ...wrapperParameters,
+      props: {
+        ...testProps,
+        name: 'autocomplete',
+        id: 'autocomplete',
+        complexValue: true,
+        debounceInterval: 0,
+      },
+    })
+
+    await wrapper.events.click(wrapper.getByLabelText('Select…'))
+
+    const filterElement = wrapper.getByRole('searchbox')
+
+    expect(filterElement).toBeInTheDocument()
+
+    expect(wrapper.queryByText('Start typing to search…')).toBeInTheDocument()
+
+    // Search is always case-insensitive.
+    await wrapper.events.type(filterElement, 'a')
+    const selectOptions = wrapper.getAllByRole('option')
+
+    expect(selectOptions).toHaveLength(1)
+    expect(selectOptions[0]).toHaveTextContent(testOptions[0].label)
+
+    await wrapper.events.click(selectOptions[0])
+
+    const node = getNode('autocomplete')
+    expect(node?._value).toEqual({
+      value: testOptions[0].value,
+      label: testOptions[0].label,
+    })
+
+    expect(wrapper.getByRole('listitem')).toHaveTextContent(
+      testOptions[0].label,
+    )
+  })
+
+  it('supports storing complex multiple values', async () => {
+    const wrapper = renderComponent(FormKit, {
+      ...wrapperParameters,
+      props: {
+        ...testProps,
+        name: 'autocomplete',
+        id: 'autocomplete',
+        multiple: true,
+        complexValue: true,
+        debounceInterval: 0,
+      },
+    })
+
+    await wrapper.events.click(wrapper.getByLabelText('Select…'))
+
+    const filterElement = wrapper.getByRole('searchbox')
+
+    expect(filterElement).toBeInTheDocument()
+
+    expect(wrapper.queryByText('Start typing to search…')).toBeInTheDocument()
+
+    await wrapper.events.type(filterElement, 'item')
+    const selectOptions = wrapper.getAllByRole('option')
+
+    expect(selectOptions).toHaveLength(3)
+    expect(selectOptions[0]).toHaveTextContent(testOptions[0].label)
+    expect(selectOptions[1]).toHaveTextContent(testOptions[1].label)
+    expect(selectOptions[2]).toHaveTextContent(testOptions[2].label)
+
+    await wrapper.events.click(selectOptions[0])
+    await wrapper.events.click(selectOptions[1])
+
+    await wrapper.events.click(wrapper.getByRole('button', { name: /Done/ }))
+
+    const [item1, item2] = wrapper.getAllByRole('listitem')
+
+    expect(item1).toHaveTextContent(testOptions[0].label)
+    expect(item2).toHaveTextContent(testOptions[1].label)
+
+    const node = getNode('autocomplete')
+    expect(node?._value).toEqual([
+      {
+        value: testOptions[0].value,
+        label: testOptions[0].label,
+      },
+      {
+        value: testOptions[1].value,
+        label: testOptions[1].label,
+      },
+    ])
+  })
 })
 
 describe('Form - Field - AutoComplete - Initial Options', () => {
@@ -464,6 +558,36 @@ describe('Form - Field - AutoComplete - Features', () => {
     const emittedInput = wrapper.emitted().inputRaw as Array<Array<InputEvent>>
 
     expect(emittedInput[0][0]).toBe(null)
+
+    expect(wrapper.queryByRole('listitem')).not.toBeInTheDocument()
+    expect(wrapper.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('supports custom clear value', async () => {
+    const wrapper = renderComponent(FormKit, {
+      ...wrapperParameters,
+      props: {
+        ...testProps,
+        options: testOptions,
+        value: testOptions[1].value,
+        clearable: true,
+        clearValue: {},
+      },
+    })
+
+    expect(wrapper.getByRole('listitem')).toHaveTextContent(
+      testOptions[1].label,
+    )
+
+    await wrapper.events.click(wrapper.getByRole('button'))
+
+    await waitFor(() => {
+      expect(wrapper.emitted().inputRaw).toBeTruthy()
+    })
+
+    const emittedInput = wrapper.emitted().inputRaw as Array<Array<InputEvent>>
+
+    expect(emittedInput[0][0]).toEqual({})
 
     expect(wrapper.queryByRole('listitem')).not.toBeInTheDocument()
     expect(wrapper.queryByRole('button')).not.toBeInTheDocument()
@@ -779,7 +903,7 @@ describe('Form - Field - AutoComplete - Features', () => {
       wrapper.queryByText(`This field doesn't start with "#".`),
     ).not.toBeInTheDocument()
 
-    const selectOptions = wrapper.getAllByRole('option')
+    const selectOptions = await wrapper.findAllByRole('option')
 
     expect(selectOptions).toHaveLength(1)
     expect(selectOptions[0]).toHaveTextContent('#foo')
@@ -801,6 +925,48 @@ describe('Form - Field - AutoComplete - Features', () => {
     })
 
     expect(wrapper.getByRole('listitem')).toHaveTextContent(`Item 1234`)
+  })
+
+  describe('supports complex values', () => {
+    it('supports non-multiple complex value', () => {
+      const wrapper = renderComponent(FormKit, {
+        ...wrapperParameters,
+        props: {
+          ...testProps,
+          value: {
+            value: 1234,
+            label: 'Item 1234',
+          },
+        },
+      })
+
+      expect(wrapper.getByRole('listitem')).toHaveTextContent('Item 1234')
+    })
+  })
+
+  it('supports multiple complex value', () => {
+    const wrapper = renderComponent(FormKit, {
+      ...wrapperParameters,
+      props: {
+        ...testProps,
+        multiple: true,
+        value: [
+          {
+            value: 1234,
+            label: 'Item 1234',
+          },
+          {
+            value: 4321,
+            label: 'Item 4321',
+          },
+        ],
+      },
+    })
+
+    const [item1, item2] = wrapper.getAllByRole('listitem')
+
+    expect(item1).toHaveTextContent('Item 1234')
+    expect(item2).toHaveTextContent('Item 4321')
   })
 })
 

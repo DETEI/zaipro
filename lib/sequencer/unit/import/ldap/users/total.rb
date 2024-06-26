@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sequencer::Unit::Import::Ldap::Users::Total < Sequencer::Unit::Base
   include ::Sequencer::Unit::Import::Common::Model::Statistics::Mixin::EmptyDiff
@@ -30,6 +30,6 @@ class Sequencer::Unit::Import::Ldap::Users::Total < Sequencer::Unit::Base
   end
 
   def cache_key
-    @cache_key ||= "#{ldap_connection.host}::#{ldap_connection.port}::#{ldap_connection.ssl}::#{ldap_connection.base_dn}::#{ldap_config[:user_filter]}"
+    @cache_key ||= "#{ldap_connection.host}::#{ldap_connection.port}::#{ldap_config[:ssl]}::#{ldap_connection.base_dn}::#{ldap_config[:user_filter]}"
   end
 end

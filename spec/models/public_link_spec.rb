@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/application_model_examples'
@@ -32,7 +32,7 @@ RSpec.describe PublicLink, type: :model do
     it 'rearranges the prios', :aggregate_failures do
       links[:third].update!(prio: 1)
 
-      link_ids = described_class.all.reorder(prio: :asc).pluck(:id)
+      link_ids = described_class.reorder(prio: :asc).pluck(:id)
 
       expect(link_ids.first).to eq(links[:third].id)
       expect(link_ids.second).to eq(links[:first].id)

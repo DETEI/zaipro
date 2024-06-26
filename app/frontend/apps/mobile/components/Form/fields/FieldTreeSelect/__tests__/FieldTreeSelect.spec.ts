@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { cloneDeep, keyBy } from 'lodash-es'
 import { getByText, waitFor } from '@testing-library/vue'
@@ -1013,7 +1013,7 @@ describe('Form - Field - TreeSelect - Features', () => {
 
     expect(selectOptions).toHaveLength(1)
 
-    expect(selectOptions[0]).toHaveTextContent('Item IV — Item A — Item 2')
+    expect(selectOptions[0]).toHaveTextContent('Item IV — Item A › Item 2')
 
     await wrapper.events.click(wrapper.getByLabelText('Clear Search'))
 
@@ -1081,7 +1081,7 @@ describe('Form - Field - TreeSelect - Features', () => {
     selectOptions = wrapper.getAllByRole('option')
 
     expect(selectOptions).toHaveLength(1)
-    expect(selectOptions[0]).toHaveTextContent('Item III — Item A — Item 1')
+    expect(selectOptions[0]).toHaveTextContent('Item III — Item A › Item 1')
 
     await wrapper.rerender({ noFiltering: true })
 

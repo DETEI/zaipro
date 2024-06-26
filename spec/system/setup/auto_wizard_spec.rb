@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -55,16 +55,12 @@ RSpec.describe 'Auto wizard', set_up: false, type: :system do
 
       close_clues_modal
 
-      visit 'logout'
-
-      expect(page).to have_current_route('login')
+      logout
 
       login(
         username: 'hans.atila@zammad.org',
         password: 'Z4mm4dr0ckZ!'
       )
-
-      expect(page).to have_current_path('/')
 
       refresh
 
@@ -83,7 +79,7 @@ RSpec.describe 'Auto wizard', set_up: false, type: :system do
       it 'shows the organization from the auto wizard' do
         fill_in id: 'global-search', with: 'Demo Organization'
 
-        click_on 'Show Search Details'
+        click_link 'Show Search Details'
 
         find('[data-tab-content=Organization]').click
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -132,6 +132,18 @@ RSpec.describe 'Knowledge Base Locale Answer Read', authenticated_as: true, type
 
       within '.knowledge-base-article' do
         expect(page).to have_text(another_translation.title)
+      end
+    end
+
+    it 'switches to invalid locale and back' do
+      open_page('lol')
+
+      in_modal do
+        click_link 'Open in primary locale'
+      end
+
+      within '.knowledge-base-article' do
+        expect(page).to have_text(published_answer.translations.first.title)
       end
     end
 

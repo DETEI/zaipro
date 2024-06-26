@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -222,5 +222,48 @@ RSpec.describe Tag, type: :model do
       end
     end
 
+  end
+
+  describe '.tag_allowed?' do
+    let(:admin) { create(:admin, groups: Group.all) }
+    let(:agent) { create(:agent, groups: Group.all) }
+
+    context 'when tag_new=true' do
+      it 'does allow new tags for agents (tag_new=true)' do
+        expect(described_class.tag_allowed?(name: SecureRandom.hex(4), user_id: agent.id)).to be(true)
+      end
+
+      it 'does allow new tags for admins (tag_new=true)' do
+        expect(described_class.tag_allowed?(name: SecureRandom.hex(4), user_id: admin.id)).to be(true)
+      end
+    end
+
+    context 'when tag_new=false' do
+      before do
+        described_class.tag_add(object: 'Ticket', item: 'test123', o_id: Ticket.first.id, created_by_id: 1)
+        create(:tag_item, name: 'no_ticket_tag')
+        Setting.set('tag_new', false)
+      end
+
+      it 'does not allow new tags for agents (tag_new=false)' do
+        expect(described_class.tag_allowed?(name: SecureRandom.hex(4), user_id: agent.id)).to be(false)
+      end
+
+      it 'does allow new tags for admins (tag_new=false)' do
+        expect(described_class.tag_allowed?(name: SecureRandom.hex(4), user_id: admin.id)).to be(true)
+      end
+
+      it 'does allow existing tags for agents (tag_new=false)' do
+        expect(described_class.tag_allowed?(name: 'test123', user_id: agent.id)).to be(true)
+      end
+
+      it 'does allow existing tags for agents (tag_new=false, but no ticket)' do
+        expect(described_class.tag_allowed?(name: 'no_ticket_tag', user_id: agent.id)).to be(true)
+      end
+
+      it 'does allow existing tags for admins (tag_new=false)' do
+        expect(described_class.tag_allowed?(name: 'test123', user_id: admin.id)).to be(true)
+      end
+    end
   end
 end

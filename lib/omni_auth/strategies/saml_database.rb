@@ -1,9 +1,11 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class OmniAuth::Strategies::SamlDatabase < OmniAuth::Strategies::SAML
   option :name, 'saml'
 
   def self.setup
+    auth_saml_credentials = Setting.get('auth_saml_credentials') || {}
+
     http_type = Setting.get('http_type')
     fqdn      = Setting.get('fqdn')
 
@@ -13,14 +15,17 @@ class OmniAuth::Strategies::SamlDatabase < OmniAuth::Strategies::SAML
     assertion_consumer_service_url = "#{http_type}://#{fqdn}/auth/saml/callback"
     single_logout_service_url      = "#{http_type}://#{fqdn}/auth/saml/slo"
 
-    config = Setting.get('auth_saml_credentials') || {}
-    config.compact_blank
+    config = auth_saml_credentials.compact_blank
       .merge(
         assertion_consumer_service_url: assertion_consumer_service_url,
         sp_entity_id:                   entity_id,
         single_logout_service_url:      single_logout_service_url,
         idp_slo_session_destroy:        proc { |env, session| destroy_session(env, session) },
       )
+
+    apply_security_settings(config)
+
+    config
   end
 
   def self.destroy_session(env, session)
@@ -39,6 +44,76 @@ class OmniAuth::Strategies::SamlDatabase < OmniAuth::Strategies::SAML
 
     super
   end
+
+  def self.apply_security_settings(settings)
+    security           = settings.delete(:security)           || {}
+    private_key        = settings.delete(:private_key)        || ''
+    private_key_secret = settings.delete(:private_key_secret) || ''
+    certificate        = settings.delete(:certificate)        || ''
+
+    return if !check_security_settings(settings, security, private_key, private_key_secret, certificate)
+
+    apply_security_default_settings(settings)
+    apply_sign_only_settings(settings, security)
+    apply_encrypt_only_settings(settings, security)
+
+    true
+  end
+
+  def self.check_security_settings(settings, security, private_key, private_key_secret, certificate)
+    return false if security.blank?    || security.eql?('off')
+    return false if private_key.blank? || certificate.blank?
+
+    begin
+      pkey = OpenSSL::PKey.read(private_key, private_key_secret)
+    rescue
+      return false
+    end
+
+    settings[:private_key] = pkey.to_pem
+    settings[:certificate] = certificate
+
+    true
+  end
+
+  def self.apply_security_default_settings(settings)
+    settings[:security] = {
+      digest_method:             XMLSecurity::Document::SHA256,
+      signature_method:          XMLSecurity::Document::RSA_SHA256,
+      authn_requests_signed:     true,
+      logout_requests_signed:    true,
+      want_assertions_signed:    true,
+      want_assertions_encrypted: true,
+    }
+
+    true
+  end
+
+  def self.apply_encrypt_only_settings(settings, security)
+    return if !security.eql?('encrypt')
+
+    settings[:security][:authn_requests_signed]  = false
+    settings[:security][:logout_requests_signed] = false
+    settings[:security][:want_assertions_signed] = false
+
+    true
+  end
+
+  def self.apply_sign_only_settings(settings, security)
+    return if !security.eql?('sign')
+
+    settings[:security][:want_assertions_encrypted] = false
+
+    true
+  end
+
+  private_class_method %i[
+    apply_security_settings
+    check_security_settings
+    apply_security_default_settings
+    apply_encrypt_only_settings
+    apply_sign_only_settings
+  ].freeze
 
   private
 

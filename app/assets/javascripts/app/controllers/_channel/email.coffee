@@ -259,7 +259,7 @@ class ChannelEmailEdit extends App.ControllerModal
 
   content: =>
     configureAttributesBase = [
-      { name: 'group_id', display: __('Destination Group'), tag: 'select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
+      { name: 'group_id', display: __('Destination Group'), tag: 'tree_select', null: false, relation: 'Group', nulloption: true, filter: { active: true } },
     ]
     @form = new App.ControllerForm(
       model:
@@ -306,14 +306,16 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
   elements:
     '.modal-body': 'body'
   events:
-    'submit .js-intro':                   'probeBasedOnIntro'
-    'submit .js-inbound':                 'probeInbound'
-    'change .js-inbound [name=adapter]':  'toggleInboundAdapter'
-    'change .js-outbound [name=adapter]': 'toggleOutboundAdapter'
-    'submit .js-outbound':                'probleOutbound'
-    'click  .js-goToSlide':               'goToSlide'
-    'click  .js-expert':                  'probeBasedOnIntro'
-    'click  .js-close':                   'hide'
+    'submit .js-intro':                    'probeBasedOnIntro'
+    'submit .js-inbound':                  'probeInbound'
+    'change .js-inbound [name=adapter]':   'toggleInboundAdapter'
+    'change .js-outbound [name=adapter]':  'toggleOutboundAdapter'
+    'change [name="options::ssl"]':        'toggleSslVerifyVisibility'
+    'change [name="options::ssl_verify"]': 'toggleSslVerifyAlert'
+    'submit .js-outbound':                 'probleOutbound'
+    'click  .js-goToSlide':                'goToSlide'
+    'click  .js-expert':                   'probeBasedOnIntro'
+    'click  .js-close':                    'hide'
   inboundPassword: ''
   outboundPassword: ''
   passwordPlaceholder: '{{{{{{{{{{{{SECRTE_PASSWORD}}}}}}}}}}}}'
@@ -379,7 +381,7 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
       { name: 'realname', display: __('Organization & Department Name'), tag: 'input',  type: 'text', limit: 160, null: false, placeholder: __('Organization Support'), autocomplete: 'off' },
       { name: 'email',    display: __('Email'),    tag: 'input',  type: 'email', limit: 120, null: false, placeholder: 'support@example.com', autocapitalize: false, autocomplete: 'off' },
       { name: 'password', display: __('Password'), tag: 'input',  type: 'password', limit: 120, null: false, autocapitalize: false, autocomplete: 'new-password', single: true },
-      { name: 'group_id', display: __('Destination Group'), tag: 'select', null: false, relation: 'Group', nulloption: true },
+      { name: 'group_id', display: __('Destination Group'), tag: 'tree_select', null: false, relation: 'Group', nulloption: true },
     ]
     @formMeta = new App.ControllerForm(
       el:    @$('.base-settings'),
@@ -391,7 +393,7 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
 
     # outbound
     configureAttributesOutbound = [
-      { name: 'adapter', display: __('Send Mails via'), tag: 'select', multiple: false, null: false, options: @channelDriver.email.outbound },
+      { name: 'adapter', display: __('Send Mails via'), tag: 'select', multiple: false, null: false, options: @channelDriver.email.outbound, translate: true },
     ]
     new App.ControllerForm(
       el:    @$('.base-outbound-type')
@@ -405,14 +407,15 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
 
     # inbound
     configureAttributesInbound = [
-      { name: 'adapter',                  display: __('Type'),     tag: 'select', multiple: false, null: false, options: @channelDriver.email.inbound },
-      { name: 'options::host',            display: __('Host'),     tag: 'input',  type: 'text', limit: 120, null: false, autocapitalize: false },
-      { name: 'options::user',            display: __('User'),     tag: 'input',  type: 'text', limit: 120, null: false, autocapitalize: false, autocomplete: 'off' },
-      { name: 'options::password',        display: __('Password'), tag: 'input',  type: 'password', limit: 120, null: false, autocapitalize: false, autocomplete: 'new-password', single: true },
-      { name: 'options::ssl',             display: __('SSL/STARTTLS'), tag: 'select', null: true, options: { 'off': __('No SSL'), 'ssl': __('SSL'), 'starttls': __('STARTTLS')  }, default: 'ssl', translate: true, item_class: 'formGroup--halfSize' },
-      { name: 'options::port',            display: __('Port'),     tag: 'input',  type: 'text', limit: 6,   null: true, autocapitalize: false,  default: '993', item_class: 'formGroup--halfSize' },
-      { name: 'options::folder',          display: __('Folder'),   tag: 'input',  type: 'text', limit: 120, null: true, autocapitalize: false, item_class: 'formGroup--halfSize' },
-      { name: 'options::keep_on_server',  display: __('Keep messages on server'), tag: 'boolean', null: true, options: { true: 'yes', false: 'no' }, translate: true, default: false, item_class: 'formGroup--halfSize' },
+      { name: 'adapter',                 display: __('Type'),     tag: 'select', multiple: false, null: false, options: @channelDriver.email.inbound, translate: true },
+      { name: 'options::host',           display: __('Host'),     tag: 'input',  type: 'text', limit: 120, null: false, autocapitalize: false },
+      { name: 'options::user',           display: __('User'),     tag: 'input',  type: 'text', limit: 120, null: false, autocapitalize: false, autocomplete: 'off' },
+      { name: 'options::password',       display: __('Password'), tag: 'input',  type: 'password', limit: 120, null: false, autocapitalize: false, autocomplete: 'new-password', single: true },
+      { name: 'options::ssl',            display: __('SSL/STARTTLS'), tag: 'select', null: true, options: { 'off': __('No SSL'), 'ssl': __('SSL'), 'starttls': __('STARTTLS')  }, default: 'ssl', translate: true, item_class: 'formGroup--halfSize' },
+      { name: 'options::ssl_verify',     display: __('SSL verification'), tag: 'boolean', default: true, null: true, translate: true, item_class: 'formGroup--halfSize' },
+      { name: 'options::port',           display: __('Port'),     tag: 'input',  type: 'text', limit: 6,   null: true, autocapitalize: false,  default: '993', item_class: 'formGroup--halfSize' },
+      { name: 'options::folder',         display: __('Folder'),   tag: 'input',  type: 'text', limit: 120, null: true, autocapitalize: false, item_class: 'formGroup--halfSize' },
+      { name: 'options::keep_on_server', display: __('Keep messages on server'), tag: 'boolean', null: true, options: { true: 'yes', false: 'no' }, translate: true, default: false, item_class: 'formGroup--halfSize' },
     ]
 
     if !@channel
@@ -478,10 +481,11 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
     adapter = @$('.js-outbound [name=adapter]').val()
     if adapter is 'smtp'
       configureAttributesOutbound = [
-        { name: 'options::host',     display: __('Host'),     tag: 'input', type: 'text',     limit: 120, null: false, autocapitalize: false, autofocus: true },
-        { name: 'options::user',     display: __('User'),     tag: 'input', type: 'text',     limit: 120, null: true, autocapitalize: false, autocomplete: 'off', },
-        { name: 'options::password', display: __('Password'), tag: 'input', type: 'password', limit: 120, null: true, autocapitalize: false, autocomplete: 'new-password', single: true },
-        { name: 'options::port',     display: __('Port'),     tag: 'input', type: 'text',     limit: 6,   null: true, autocapitalize: false },
+        { name: 'options::host',       display: __('Host'),       tag: 'input',  type: 'text',     limit: 120, null: false, autocapitalize: false, autofocus: true },
+        { name: 'options::user',       display: __('User'),       tag: 'input',  type: 'text',     limit: 120, null: true, autocapitalize: false, autocomplete: 'off', },
+        { name: 'options::password',   display: __('Password'),   tag: 'input',  type: 'password', limit: 120, null: true, autocapitalize: false, autocomplete: 'new-password', single: true },
+        { name: 'options::port',       display: __('Port'),       tag: 'input',  type: 'text',     limit: 6,   null: true, autocapitalize: false, item_class: 'formGroup--halfSize' },
+        { name: 'options::ssl_verify', display: __('SSL verification'), tag: 'boolean', default: true, null: true, translate: true, item_class: 'formGroup--halfSize' },
       ]
       @form = new App.ControllerForm(
         el:    @$('.base-outbound-settings')
@@ -490,6 +494,41 @@ class ChannelEmailAccountWizard extends App.ControllerWizardModal
           className: ''
         params: @account.outbound
       )
+
+  toggleSslVerifyVisibility: (e) ->
+    elem      = $(e.target)
+    isEnabled = elem.val() isnt 'off'
+
+    sslVerifyField = elem.closest('form')
+      .find('[name="options::ssl_verify"]')
+
+    if isEnabled
+      sslVerifyField.removeAttr('disabled')
+    else
+      sslVerifyField.attr('disabled', 'disabled')
+
+    @toggleSslVerifyAlert(target: sslVerifyField, !isEnabled)
+
+  toggleSslVerifyAlert: (e, forceInvisible) ->
+    elem           = $(e.target)
+    isAlertVisible = if forceInvisible then false else elem.val() != 'true'
+
+    elem.closest('.modal-content')
+      .find('.js-sslVerifyAlert')
+      .toggleClass('hide', !isAlertVisible)
+
+  showSlide: (className) ->
+    super
+
+    container      = @$('.'+className)
+    sslVerifyField = container.find('[name="options::ssl_verify"]')
+
+    return if sslVerifyField.length != 1
+    return if sslVerifyField.val() == 'true'
+
+    container
+      .find('.js-sslVerifyAlert')
+      .removeClass('hide')
 
   probeBasedOnIntro: (e) =>
     e.preventDefault()
@@ -780,9 +819,10 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
   elements:
     '.modal-body': 'body'
   events:
-    'change .js-outbound [name=adapter]': 'toggleOutboundAdapter'
-    'submit .js-outbound':                'probleOutbound'
-    'click  .js-close':                   'hide'
+    'change [name="options::ssl_verify"]': 'toggleSslVerifyAlert'
+    'change .js-outbound [name=adapter]':  'toggleOutboundAdapter'
+    'submit .js-outbound':                 'probleOutbound'
+    'click  .js-close':                    'hide'
   inboundPassword: ''
   outboundPassword: ''
   passwordPlaceholder: '{{{{{{{{{{{{SECRTE_PASSWORD}}}}}}}}}}}}'
@@ -817,6 +857,7 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
       @el.addClass('modal--local')
 
     @render()
+    @toggleSslVerifyAlert(target: @el.find('[name="options::ssl_verify"]'))
 
     @el.modal(
       keyboard:  true
@@ -827,7 +868,7 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
       'show.bs.modal':   @onShow
       'shown.bs.modal': =>
         @el.addClass('modal--ready')
-        @onShown()
+        @onShown() if @onShown
       'hidden.bs.modal': =>
         if @callback
           @callback()
@@ -842,7 +883,7 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
 
     # outbound
     configureAttributesOutbound = [
-      { name: 'adapter', display: __('Send Mails via'), tag: 'select', multiple: false, null: false, options: @channelDriver.email.outbound },
+      { name: 'adapter', display: __('Send Mails via'), tag: 'select', multiple: false, null: false, options: @channelDriver.email.outbound, translate: true },
     ]
     new App.ControllerForm(
       el:    @$('.base-outbound-type')
@@ -861,10 +902,11 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
     adapter = @$('.js-outbound [name=adapter]').val()
     if adapter is 'smtp'
       configureAttributesOutbound = [
-        { name: 'options::host',     display: __('Host'),     tag: 'input', type: 'text',     limit: 120, null: false, autocapitalize: false, autofocus: true },
-        { name: 'options::user',     display: __('User'),     tag: 'input', type: 'text',     limit: 120, null: true, autocapitalize: false, autocomplete: 'off' },
-        { name: 'options::password', display: __('Password'), tag: 'input', type: 'password', limit: 120, null: true, autocapitalize: false, autocomplete: 'new-password', single: true },
-        { name: 'options::port',     display: __('Port'),     tag: 'input', type: 'text',     limit: 6,   null: true, autocapitalize: false },
+        { name: 'options::host',       display: __('Host'),     tag: 'input', type: 'text',     limit: 120, null: false, autocapitalize: false, autofocus: true },
+        { name: 'options::user',       display: __('User'),     tag: 'input', type: 'text',     limit: 120, null: true, autocapitalize: false, autocomplete: 'off' },
+        { name: 'options::password',   display: __('Password'), tag: 'input', type: 'password', limit: 120, null: true, autocapitalize: false, autocomplete: 'new-password', single: true },
+        { name: 'options::port',       display: __('Port'),     tag: 'input', type: 'text',     limit: 6,   null: true, autocapitalize: false, item_class: 'formGroup--halfSize' },
+        { name: 'options::ssl_verify', display: __('SSL verification'), tag: 'boolean', default: true, null: true, translate: true, item_class: 'formGroup--halfSize' },
       ]
       @form = new App.ControllerForm(
         el:    @$('.base-outbound-settings')
@@ -873,6 +915,14 @@ class ChannelEmailNotificationWizard extends App.ControllerWizardModal
           className: ''
         params: @account.outbound
       )
+
+  toggleSslVerifyAlert: (e, forceInvisible) ->
+    elem           = $(e.target)
+    isAlertVisible = if forceInvisible then false else elem.val() != 'true'
+
+    elem.closest('.modal-content')
+      .find('.js-sslVerifyAlert')
+      .toggleClass('hide', !isAlertVisible)
 
   probleOutbound: (e) =>
     e.preventDefault()

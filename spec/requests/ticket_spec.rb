@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -2223,7 +2223,7 @@ RSpec.describe 'Ticket', type: :request do
 
     it 'create ticket with mentions' do
       new_ticket_with_mentions
-      expect(Mention.all.count).to eq(3)
+      expect(Mention.count).to eq(3)
     end
 
     it 'check ticket get' do
@@ -2574,6 +2574,29 @@ RSpec.describe 'Ticket', type: :request do
         origin_by_id: User.find_by(email: 'dummy@example.com').id,
         from:         '  <dummy@example.com>',
       )
+    end
+  end
+
+  describe 'Agents can create new tags even if prohibited by the settings #3501', authenticated_as: :agent do
+    let(:tag) { SecureRandom.hex(4) }
+
+    before do
+      Setting.set('tag_new', false)
+    end
+
+    it 'does create the ticket without tags' do
+      params = {
+        title:       'a new ticket #3',
+        group:       Group.first.name,
+        priority:    '2 normal',
+        state:       'new',
+        customer_id: customer.id,
+        tags:        tag,
+      }
+
+      post '/api/v1/tickets', params: params, as: :json
+      expect(response).to have_http_status(:created)
+      expect(Ticket.last.tag_list).to eq([])
     end
   end
 end

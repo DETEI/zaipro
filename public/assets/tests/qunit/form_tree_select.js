@@ -185,6 +185,7 @@ QUnit.test("form elements check", assert => {
   });
   assert.equal(el.find('[name="tree_select"]').val(), 'aa::aab', 'check tree_select value');
   assert.equal(el.find('[name="tree_select"]').closest('.searchableSelect').find('.js-input').val(), 'yes2', 'check tree_select .js-input value');
+  assert.equal(el.find('[name="tree_select"]').closest('.searchableSelect').find('.js-input').attr('title'), 'yes › yes2', 'check tree_select .js-input tooltip');
   var params = App.ControllerForm.params(el)
   var test_params = {
     tree_select: 'aa::aab'
@@ -705,6 +706,48 @@ QUnit.test("[Core Workflow] Remove option does not work with tree select node th
   attribute.value = ['aa::aaa']
   element = App.UiElement.tree_select.render(attribute)
   assert.equal(false, element.find(".token[data-value='aa::aaa']").length > 0)
+
+  el.append(element)
+});
+
+QUnit.test("Escaping of values works just fine", assert => {
+  $('#forms').append('<hr><h1>Escaping of values works just fine form9</h1><form id="form9"></form>')
+  var el = $('#form9')
+
+  attribute = {
+    "name": "multi_tree_select",
+    "display": "multi_tree_select",
+    "tag": "multi_tree_select",
+    "null": true,
+    "nulloption": true,
+    "translate": true,
+    "multiple": true,
+    "options": [
+      {
+        "value": "aa",
+        "name": "aa yes",
+        "children": [
+          {
+            "value": 'aa::aaa "test"',
+            "name": "aa yes with quote",
+          },
+          {
+            "value": "aa::aab",
+            "name": "aa yes2",
+          },
+        ]
+      },
+    ],
+  }
+
+  attribute.value = ['aa::aaa "test"']
+  element = App.UiElement.tree_select.render(attribute)
+
+  escaped_selector = jQuery.escapeSelector('aa::aaa "test"')
+  assert.equal(true, element.find(".token[data-value=" + escaped_selector + "]").length > 0)
+
+  element.find('.js-remove').trigger('click')
+  assert.equal(false, element.find(".token[data-value=" + escaped_selector + "]").length > 0)
 
   el.append(element)
 });

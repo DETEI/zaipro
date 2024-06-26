@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class TicketTimeAccountingCheck < ActiveRecord::Migration[6.1]
   def change
@@ -33,7 +33,7 @@ class TicketTimeAccountingCheck < ActiveRecord::Migration[6.1]
     )
   end
 
-  def update_time_accounting_selector # rubocop:disable Metrics/AbcSize
+  def update_time_accounting_selector
     selector = Setting.get('time_accounting_selector')
     return if selector.blank?
     return if selector[:condition].blank?

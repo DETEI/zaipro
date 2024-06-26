@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'net/pop'
 
@@ -49,6 +49,7 @@ returns
     if options[:ssl] == 'off'
       ssl = false
     end
+    ssl_verify = options.fetch(:ssl_verify, true)
 
     port = if options.key?(:port) && options[:port].present?
              options[:port].to_i
@@ -72,7 +73,8 @@ returns
     end
 
     if ssl
-      @pop.enable_ssl(OpenSSL::SSL::VERIFY_NONE)
+      Certificate::ApplySSLCertificates.ensure_fresh_ssl_context
+      @pop.enable_ssl((ssl_verify ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE))
     end
     @pop.start(options[:user], options[:password])
 

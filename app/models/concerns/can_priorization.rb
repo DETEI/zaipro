@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module CanPriorization
   extend ActiveSupport::Concern
@@ -38,7 +38,7 @@ module CanPriorization
   end
 
   def rearrangement_previous_ordered_ids
-    self.class.all.reorder(
+    self.class.reorder(
       prio:       :asc,
       updated_at: :desc
     ).pluck(:id)

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -114,6 +114,22 @@ RSpec.describe Tag, type: :request do
           expect(json_response.first['value']).to eq(tags.last.name)
         end
       end
+    end
+  end
+
+  describe 'Agents can create new tags even if prohibited by the settings #3501', authenticated_as: :agent do
+    let(:tag)     { SecureRandom.hex(4) }
+    let(:ticket)  { Ticket.first }
+    let(:agent)   { create(:agent, groups: [ticket.group]) }
+    let(:payload) { { object: ticket.class.name, item: 'bar', o_id: ticket.id } }
+
+    before do
+      Setting.set('tag_new', false)
+    end
+
+    it 'does not add tags to the ticket' do
+      post '/api/v1/tags/add', params: payload
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

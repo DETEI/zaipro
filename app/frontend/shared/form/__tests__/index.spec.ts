@@ -1,9 +1,9 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { createApp } from 'vue'
 import type { ImportGlobEagerOutput } from '#shared/types/utils.ts'
 import type { FormKitPlugin } from '@formkit/core'
-import initializeForm, { getFormPlugins } from '..'
+import initializeForm, { getFormPlugins } from '../index.ts'
 
 describe('getFormPlugins', () => {
   const examplePlugin = vi.fn()

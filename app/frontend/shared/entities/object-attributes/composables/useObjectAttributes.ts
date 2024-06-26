@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { computed, toRefs } from 'vue'
 import { QueryHandler } from '#shared/server/apollo/handler/index.ts'
@@ -57,7 +57,7 @@ export const useObjectAttributes = (object: EnumObjectManagerObjects) => {
       const lookup: Map<string, FormSchemaField> = new Map()
 
       attributes.value?.forEach((attribute) =>
-        lookup.set(attribute.name, getFieldFromAttribute(attribute)),
+        lookup.set(attribute.name, getFieldFromAttribute(object, attribute)),
       )
 
       return lookup

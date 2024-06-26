@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Taskbar
   module Assets
@@ -23,11 +23,11 @@ class Taskbar
     def assets_content(data)
       return if state.blank?
       return if !key.starts_with?('TicketCreateScreen')
+
       assets_user(data)
       assets_state(data)
       assets_priority(data)
       assets_group(data)
-      ticket_date_closet(data)
     end
 
     def assets_user(data)
@@ -45,10 +45,6 @@ class Taskbar
 
     def assets_group(data)
       Group.find_by(id: state[:group_id])&.assets(data)
-    end
-
-    def ticket_date_closet(data)
-      # Ticket.find_by(id: state[:priority_id])&.assets(data)
     end
   end
 end

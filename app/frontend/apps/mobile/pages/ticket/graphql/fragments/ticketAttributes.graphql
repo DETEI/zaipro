@@ -19,6 +19,7 @@ fragment ticketAttributes on Ticket {
     firstname
     lastname
     fullname
+    phone
     image
     vip
     active
@@ -82,4 +83,7 @@ fragment ticketAttributes on Ticket {
   subscribed
   preferences
   stateColorCode
+  firstResponseEscalationAt
+  closeEscalationAt
+  updateEscalationAt
 }

@@ -1,10 +1,10 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { faker } from '@faker-js/faker'
 import type { Organization, User } from '#shared/graphql/types.ts'
 import type { DeepPartial } from '#shared/types/utils.ts'
 import { convertToGraphQLId } from '#shared/graphql/utils.ts'
-import { getStoredMockedObject } from './index.ts'
+import { getStoredMockedObject } from '../builders/index.ts'
 
 export default (
   parent: any | undefined,
@@ -21,7 +21,7 @@ export default (
     email: faker.internet.email(),
     fax: null,
     login: faker.internet.userName(),
-    phone: faker.phone.number('+49 #### ######'),
+    phone: faker.helpers.replaceSymbolWithNumber('+49 #### ######'),
     objectAttributeValues: [],
     createdBy: null,
     secondaryOrganizations: {
@@ -33,13 +33,13 @@ export default (
       update: true,
       destroy: true,
     },
+    authorizations: [],
   }
   if (parent?.__typename === 'Organization') {
     user.organization = parent
   } else if (userValue) {
     const organization = getStoredMockedObject<Organization>('Organization', 1)
     if (organization) {
-      // organization.m
       // if the organization already exists, add the user to it
       user.organization = organization
       const members = organization.members.edges
@@ -51,6 +51,7 @@ export default (
         node: userValue as any,
       })
       organization.members.totalCount += 1
+      organization.members.pageInfo ??= {} as any
       organization.members.pageInfo.startCursor = members[0]?.cursor || cursor
       organization.members.pageInfo.endCursor = cursor
     } else {

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Mutations
   class Tag::Assignment::Add < Tag::Assignment::Base
@@ -11,6 +11,7 @@ module Gql::Mutations
 
     def resolve(tag:, object_id:)
       object = fetch_object(object_id)
+      raise Exceptions::Forbidden if !::Tag.tag_allowed?(name: tag, user_id: context.current_user.id)
 
       { success: object.tag_add(tag, context.current_user.id) }
     end

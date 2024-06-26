@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { useDialogObjectForm } from '#mobile/components/CommonDialogObjectForm/useDialogObjectForm.ts'
 import { defineFormSchema } from '#mobile/form/defineFormSchema.ts'
@@ -10,7 +10,11 @@ import {
 } from '#shared/graphql/types.ts'
 import { useRouter } from 'vue-router'
 
-export const useUserCreate = () => {
+interface UserCreateOptions {
+  onUserCreated?: (user: User) => void
+}
+
+export const useUserCreate = (options: UserCreateOptions = {}) => {
   const dialogCreate = useDialogObjectForm(
     'user-create',
     EnumObjectManagerObjects.User,
@@ -34,7 +38,6 @@ export const useUserCreate = () => {
   const onSuccess = (data: { userAdd: UserAddPayload }) => {
     const { internalId } = data.userAdd.user as User
 
-    // TODO change when actually implemented
     router.push(`/users/${internalId}`)
   }
 
@@ -42,7 +45,10 @@ export const useUserCreate = () => {
     dialogCreate.openDialog({
       mutation: useUserAddMutation,
       schema,
-      onSuccess,
+      onSuccess: options.onUserCreated
+        ? (query: { userAdd: UserAddPayload }) =>
+            options.onUserCreated!(query.userAdd.user!)
+        : onSuccess,
       formUpdaterId: EnumFormUpdaterId.FormUpdaterUpdaterUserCreate,
       errorNotificationMessage: __('User could not be created.'),
     })

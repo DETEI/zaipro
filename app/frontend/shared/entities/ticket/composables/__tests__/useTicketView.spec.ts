@@ -1,8 +1,8 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { mockPermissions } from '#tests/support/mock-permissions.ts'
 import { ref } from 'vue'
-import { generateObjectData } from '#tests/graphql/index.ts'
+import { generateObjectData } from '#tests/graphql/builders/index.ts'
 import type { Ticket } from '#shared/graphql/types.ts'
 import { useTicketView } from '../useTicketView.ts'
 

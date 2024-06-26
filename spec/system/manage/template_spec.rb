@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'system/examples/pagination_examples'
@@ -78,7 +78,7 @@ RSpec.describe 'Manage > Templates', type: :system do
         check_select_field_value('options::ticket.formSenderType::value', template.options['ticket.formSenderType']['value'])
         check_input_field_value('options::ticket.title::value', template.options['ticket.title']['value'])
         check_editor_field_value('options::article.body::value', template.options['article.body']['value'])
-        check_select_field_value('options::ticket.group_id::value', template.options['ticket.group_id']['value'].to_s)
+        check_tree_select_field_value('options::ticket.group_id::value', template.options['ticket.group_id']['value'].to_s)
         check_input_field_value('options::ticket.customer_id::value_completion', template.options['ticket.customer_id']['value_completion'])
         check_input_field_value('options::ticket.owner_id::value', template.options['ticket.owner_id']['value'].to_s, visible: :all)
       end

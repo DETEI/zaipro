@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -486,7 +486,7 @@ RSpec.describe 'ObjectManager Attributes', type: :request do
         condition: {
           'ticket.state_id':                                 {
             operator: 'is',
-            value:    Ticket::State.all.pluck(:id),
+            value:    Ticket::State.pluck(:id),
           },
           'ticket.test_attribute_referenced_by_an_overview': {
             operator: 'contains',
@@ -663,6 +663,7 @@ RSpec.describe 'ObjectManager Attributes', type: :request do
       # 2. create a scheduler that uses the attribute
       params = {
         name:                 'test_scheduler',
+        object:               'Ticket',
         timeplan:             {
           days:    {
             Mon: true,
@@ -838,7 +839,7 @@ RSpec.describe 'ObjectManager Attributes', type: :request do
         condition: {
           'ticket.state_id':                                 {
             operator: 'is',
-            value:    Ticket::State.all.pluck(:id),
+            value:    Ticket::State.pluck(:id),
           },
           'ticket.test_attribute_referenced_by_an_overview': {
             operator: 'contains',

@@ -26,6 +26,10 @@ class App.TicketBulkForm extends App.Controller
         localAttribute.nulloption = true
         localAttribute.default = ''
         localAttribute.null = true
+
+        if localAttribute.name == 'group_id'
+          localAttribute.direction = 'up'
+
         @configure_attributes_ticket.push localAttribute
 
     # add field for ticket ids
@@ -71,6 +75,8 @@ class App.TicketBulkForm extends App.Controller
       noFieldset:     true
     )
 
+    @controllerFormBulk.$('[data-attribute-name="group_id"] .controls').addClass('form-control')
+
     new App.ControllerForm(
       el: @$('#form-ticket-bulk-comment')
       model:
@@ -83,7 +89,7 @@ class App.TicketBulkForm extends App.Controller
 
     @confirm_attributes = [
       { name: 'type_id',  display: __('Type'),       tag: 'select', multiple: false, null: true, relation: 'TicketArticleType', filter: @articleTypeFilter, default: '9', translate: true, class: 'medium' }
-      { name: 'internal', display: __('Visibility'), tag: 'select', null: true, options: { true: 'internal', false: 'public' }, class: 'medium', item_class: '', default: false }
+      { name: 'internal', display: __('Visibility'), tag: 'select', null: true, options: { true: 'internal', false: 'public' }, class: 'medium', item_class: '', default: false, translate: true }
     ]
 
     new App.ControllerForm(

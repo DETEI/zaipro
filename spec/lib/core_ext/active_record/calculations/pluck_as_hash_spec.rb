@@ -1,8 +1,8 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
-RSpec.describe ActiveRecord::Calculations do # rubocop:disable RSpec/FilePath
+RSpec.describe ActiveRecord::Calculations do
   describe '#pluck_as_hash' do
     let(:ticket) { create(:ticket) }
 

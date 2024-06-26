@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Ticket::TimeAccounting < ApplicationModel
   validates :time_unit, presence: true
@@ -42,6 +42,6 @@ class Ticket::TimeAccounting < ApplicationModel
     return if ticket_article.blank?
     return if ticket_article.ticket_id == ticket_id
 
-    errors.add :ticket_article, __('Given Ticket Article is not part of the Ticket')
+    errors.add :ticket_article, __('This article is not part of the ticket.')
   end
 end

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class ImportFreshdeskController < ApplicationController
 
@@ -108,7 +108,7 @@ class ImportFreshdeskController < ApplicationController
   private
 
   def setup_done
-    count = User.all.count
+    count = User.count
     done = true
     if count <= 2
       done = false

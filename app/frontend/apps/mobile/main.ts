@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { createApp } from 'vue'
 import initializeApp from '#mobile/initialize.ts'
@@ -58,6 +58,10 @@ export default async function mountApp(): Promise<void> {
 
   if (!locale.localeData) {
     await locale.setLocale()
+  }
+
+  if (VITE_TEST_MODE) {
+    await import('#shared/initializer/initializeFakeTimer.ts')
   }
 
   app.mount('#app')

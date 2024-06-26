@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class BackgroundServices
   class Service
@@ -21,7 +21,7 @@ class BackgroundServices
           result = nil
 
           realtime = Benchmark.realtime do
-            Rails.logger.debug { "*** worker thread, #{::Delayed::Job.all.count} in queue" }
+            Rails.logger.debug { "*** worker thread, #{::Delayed::Job.count} in queue" }
             result = ::Delayed::Worker.new.work_off
           end
 

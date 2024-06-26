@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
@@ -42,7 +42,7 @@ const target = computed(() => {
   return null
 })
 
-// TODO: Correct styling is currently missing.
+// TODO: Other default styles possible?
 const linkClass = computed(() => {
   if (props.disabled) {
     return 'pointer-events-none'

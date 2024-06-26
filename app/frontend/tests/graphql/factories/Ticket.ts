@@ -1,10 +1,10 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { faker } from '@faker-js/faker'
 import type { Ticket } from '#shared/graphql/types.ts'
 import type { DeepPartial } from '#shared/types/utils.ts'
 import { convertToGraphQLId } from '#shared/graphql/utils.ts'
-import type { ResolversMeta } from './index.ts'
+import type { ResolversMeta } from '../builders/index.ts'
 
 export default (
   _parent: unknown,

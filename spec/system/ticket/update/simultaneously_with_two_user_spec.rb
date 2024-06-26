@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -204,7 +204,7 @@ RSpec.describe 'Ticket > Update > Simultaneously with two different user', type:
 
       using_session(:second_browser) do
         find('.js-textarea').send_keys('some other note')
-        find('.js-objectTitle').set('TTTsome level 2 <b>subject</b> 123äöü')
+        find('.ticketZoom-header .js-objectTitle').set('TTTsome level 2 <b>subject</b> 123äöü')
 
         # Click in the body field, to trigger the title update.
         find('.js-textarea').send_keys('trigger title')

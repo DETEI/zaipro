@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -31,11 +31,10 @@ RSpec.describe Service::GeoIp, integration: true do
           let(:expected_result) do
             {
               'country_name'   => 'Switzerland',
-              'city_name'      => 'Amriswil',
               'country_code'   => 'CH',
               'continent_code' => 'EU',
-              'latitude'       => 47.5465,
-              'longitude'      => 9.2901,
+              'latitude'       => be_a(Float),
+              'longitude'      => be_a(Float),
             }
           end
 
@@ -47,11 +46,11 @@ RSpec.describe Service::GeoIp, integration: true do
           let(:expected_result) do
             {
               'country_name'   => 'Germany',
-              'city_name'      => 'Chemnitz',
+              'city_name'      => be_present,
               'country_code'   => 'DE',
               'continent_code' => 'EU',
-              'latitude'       => 50.8191,
-              'longitude'      => 12.9419,
+              'latitude'       => be_a(Float),
+              'longitude'      => be_a(Float),
             }
           end
 
@@ -63,11 +62,11 @@ RSpec.describe Service::GeoIp, integration: true do
           let(:expected_result) do
             {
               'country_name'   => 'Germany',
-              'city_name'      => 'Halle',
+              'city_name'      => be_present,
               'country_code'   => 'DE',
               'continent_code' => 'EU',
-              'latitude'       => 51.5036,
-              'longitude'      => 11.9594,
+              'latitude'       => be_a(Float),
+              'longitude'      => be_a(Float),
             }
           end
 
@@ -79,11 +78,11 @@ RSpec.describe Service::GeoIp, integration: true do
           let(:expected_result) do
             {
               'country_name'   => 'United States',
-              'city_name'      => 'Richmond',
+              'city_name'      => be_present,
               'country_code'   => 'US',
               'continent_code' => 'NA',
-              'latitude'       => 37.9387,
-              'longitude'      => -122.3661,
+              'latitude'       => be_a(Float),
+              'longitude'      => be_a(Float),
             }
           end
 

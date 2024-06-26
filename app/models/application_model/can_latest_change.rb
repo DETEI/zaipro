@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module ApplicationModel::CanLatestChange
   extend ActiveSupport::Concern
@@ -19,7 +19,7 @@ returns
 =end
 
     def latest_change
-      maximum(:updated_at)&.to_s(:nsec)
+      maximum(:updated_at)&.to_fs(:nsec)
     end
   end
 end

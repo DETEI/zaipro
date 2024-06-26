@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -20,6 +20,7 @@ RSpec.describe 'Validations::ObjectManager::AttributeValidator::DataTypes', aggr
     integer
     autocompletion_ajax
     autocompletion_ajax_customer_organization
+    autocompletion_ajax_external_data_source
     boolean
     user_permission
     active

@@ -1,13 +1,7 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 const { splitVendorChunk } = require('vite')
 
-const graphqlChunk = ['graphql', '@apollo', '@wry']
-
-const isGraphqlChunk = (id) =>
-  graphqlChunk.some((chunk) => id.includes(`node_modules/${chunk}`))
-
-const graphqlIds = new Set()
 const matchers = [
   {
     vendor: false,
@@ -38,24 +32,6 @@ const matchers = [
     vendor: true,
     matcher: (id) => id.includes('node_modules/lodash-es'),
     chunk: 'lodash',
-  },
-  {
-    vendor: true,
-    matcher: (id, api) => {
-      const { importers, dynamicImporters } = api.getModuleInfo(id)
-      const match =
-        graphqlIds.has(id) ||
-        isGraphqlChunk(id) ||
-        importers.some(isGraphqlChunk) ||
-        dynamicImporters.some(isGraphqlChunk)
-
-      if (match) {
-        dynamicImporters.forEach(() => graphqlIds.add(id))
-        importers.forEach(() => graphqlIds.add(id))
-      }
-      return match
-    },
-    chunk: 'graphql',
   },
   {
     vendor: true,

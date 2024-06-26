@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -13,10 +13,13 @@ RSpec.describe 'Data Privacy', authenticated_as: :authenticate, type: :system do
   end
 
   context 'when data privacy admin interface' do
-    it 'deletes customer' do
+    before do
       visit 'system/data_privacy'
+      ensure_websocket
       click '.js-new'
+    end
 
+    it 'deletes customer' do
       find(:css, '.js-input').send_keys(customer.firstname)
       expect(page).to have_css('.searchableSelect-option-text')
       click '.searchableSelect-option-text'
@@ -41,9 +44,6 @@ RSpec.describe 'Data Privacy', authenticated_as: :authenticate, type: :system do
       end
 
       it 'deletes customer' do
-        visit 'system/data_privacy'
-        click '.js-new'
-
         find(:css, '.js-input').send_keys(customer.firstname)
         expect(page).to have_css('.searchableSelect-option-text')
         click '.searchableSelect-option-text'
@@ -57,9 +57,6 @@ RSpec.describe 'Data Privacy', authenticated_as: :authenticate, type: :system do
       end
 
       it 'deletes customer by email' do
-        visit 'system/data_privacy'
-        click '.js-new'
-
         find(:css, '.js-input').send_keys(customer.email)
         expect(page).to have_css('.searchableSelect-option-text')
         click '.searchableSelect-option-text'
@@ -77,9 +74,10 @@ RSpec.describe 'Data Privacy', authenticated_as: :authenticate, type: :system do
   context 'when user profile' do
     it 'deletes customer' do
       visit "user/profile/#{customer.id}"
+      ensure_websocket
 
       click '.dropdown--actions'
-      click_on 'Delete'
+      click_link 'Delete'
 
       fill_in 'Are you sure?', with: 'DELETE'
       click '.js-submit'
@@ -93,10 +91,11 @@ RSpec.describe 'Data Privacy', authenticated_as: :authenticate, type: :system do
   context 'when ticket zoom' do
     it 'deletes customer' do
       visit "ticket/zoom/#{ticket.id}"
+      ensure_websocket
 
       click '.tabsSidebar-tab[data-tab=customer]'
       click 'h2.js-headline'
-      click_on 'Delete Customer'
+      click_link 'Delete Customer'
 
       fill_in 'Are you sure?', with: 'DELETE'
       click '.js-submit'

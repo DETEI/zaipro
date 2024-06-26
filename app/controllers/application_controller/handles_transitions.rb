@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module ApplicationController::HandlesTransitions
   extend ActiveSupport::Concern
@@ -17,7 +17,6 @@ module ApplicationController::HandlesTransitions
 
     TransactionDispatcher.commit
     PushMessages.finish
-    ActiveSupport::Dependencies::Reference.clear!
   ensure
     ApplicationHandleInfo.current = nil
   end

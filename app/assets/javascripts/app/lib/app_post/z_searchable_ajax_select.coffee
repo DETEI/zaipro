@@ -5,6 +5,19 @@ class App.SearchableAjaxSelect extends App.SearchableSelect
     # create cache
     @searchResultCache = {}
 
+  render: ->
+    if not _.isEmpty(@attribute.value) and not @attribute.multiple
+      @attribute.options = [] if not _.isArray(@attribute.options)
+
+      if @attribute.relation
+        if App[@attribute.relation] && App[@attribute.relation].exists(@attribute.value)
+          displayName = App[@attribute.relation].find(@attribute.value).displayName()
+          @attribute.options.push({ value: @attribute.value, name: displayName, selected: true })
+      else
+        @attribute.options.push({ value: @attribute.value, name: @attribute.valueName or @attribute.value, selected: true })
+
+    super
+
   objectString: =>
     # convert requested object
     # e.g. Ticket to ticket or AnotherObject to another_object
@@ -32,7 +45,15 @@ class App.SearchableAjaxSelect extends App.SearchableSelect
         # cache search result
         @searchResultCache[cacheKey] = data
         @renderResponse(data, query)
+      error: =>
+        @hideLoader()
     }
+
+  hideLoader: =>
+    # Clear timeout and remove the loader icon.
+    clearTimeout @loaderTimeoutId
+    @loaderTimeoutId = undefined
+    @el.removeClass('is-loading')
 
   onInput: (event) =>
     super
@@ -61,10 +82,7 @@ class App.SearchableAjaxSelect extends App.SearchableSelect
     App.Ajax.request(attributes)
 
   renderResponse: (data, originalQuery) =>
-    # clear timout and remove loader icon
-    clearTimeout @loaderTimeoutId
-    @loaderTimeoutId = undefined
-    @el.removeClass('is-loading')
+    @hideLoader()
 
     # load assets
     App.Collection.loadAssets(data.assets)

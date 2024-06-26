@@ -24,6 +24,7 @@ export const TicketAttributesFragmentDoc = gql`
     firstname
     lastname
     fullname
+    phone
     image
     vip
     active
@@ -87,5 +88,8 @@ export const TicketAttributesFragmentDoc = gql`
   subscribed
   preferences
   stateColorCode
+  firstResponseEscalationAt
+  closeEscalationAt
+  updateEscalationAt
 }
     ${ObjectAttributeValuesFragmentDoc}`;

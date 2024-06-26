@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { en } from '@formkit/i18n'
 import loadLocales from '../locales.ts'
@@ -12,19 +12,15 @@ const staticLocaleValidation = staticLocale.validation
 describe('locales', () => {
   it('check the ui strings', () => {
     Object.keys(en.ui).forEach((key) => {
-      if (!staticLocaleUI[key]) {
-        console.log(`Missing form kit ui string "${key}".`)
-      }
-      expect(staticLocaleUI[key]).toBeTruthy()
+      expect.soft(staticLocaleUI[key], `"${key}" is not defined`).toBeTruthy()
     })
   })
 
   it('check the validation strings', () => {
     Object.keys(en.validation).forEach((key) => {
-      if (!staticLocaleValidation[key]) {
-        console.log(`Missing validation string "${key}".`)
-      }
-      expect(staticLocaleValidation[key]).toBeTruthy()
+      expect
+        .soft(staticLocaleValidation[key], `"${key}" is not defined`)
+        .toBeTruthy()
     })
   })
 })

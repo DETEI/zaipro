@@ -1,8 +1,8 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Sessions::Event::ChatTransfer < Sessions::Event::ChatBase
 
-  def run # rubocop:disable Metrics/AbcSize
+  def run
     return super if super
     return if !permission_check('chat.agent', 'chat')
 

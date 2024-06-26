@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 require 'models/core_workflow/base'
@@ -310,6 +310,52 @@ RSpec.describe CoreWorkflow, mariadb: true, type: :model do
 
     it 'does not prefill if body is set already' do
       expect(result[:fill_in]['body']).to be_blank
+    end
+  end
+
+  describe 'Core-Workflows: Removing groups with re-adding some discards all permissions the user has #5002' do
+    let(:payload) do
+      base_payload.merge('params' => { 'group_id' => Group.first.id })
+    end
+    let!(:workflow1) do
+      create(:core_workflow,
+             object:  'Ticket',
+             perform: {
+               'ticket.group_id': {
+                 operator:      'remove_option',
+                 remove_option: Group.all.map { |x| x.id.to_s },
+               },
+             })
+    end
+    let!(:workflow2) do
+      create(:core_workflow,
+             object:  'Ticket',
+             perform: {
+               'ticket.group_id': {
+                 operator:   'add_option',
+                 add_option: [Group.first.id.to_s],
+               },
+             })
+    end
+
+    before do
+      action_user.group_names_access_map = {
+        Group.first.name => %w[full],
+      }
+      workflow1
+      workflow2
+    end
+
+    it 'does readd the group' do
+      expect(result[:restrict_values]['group_id']).to eq(['', Group.first.id.to_s])
+    end
+
+    it 'does keep owners' do
+      expect(result[:restrict_values]['owner_id']).to include(action_user.id.to_s)
+    end
+
+    it 'does not endless loop because of removing and adding the same element' do
+      expect(result[:rerun_count]).to be < CoreWorkflow::Result::MAX_RERUN
     end
   end
 end

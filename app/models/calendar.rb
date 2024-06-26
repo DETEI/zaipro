@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Calendar < ApplicationModel
   include ChecksClientNotification
@@ -225,14 +225,14 @@ returns
 
       cal_file = result.body
     else
-      cal_file = File.open(location)
+      cal_file = File.read(location)
     end
 
     cals = Icalendar::Calendar.parse(cal_file)
     cal = cals.first
     events = {}
     cal.events.each do |event|
-      if event.rrule
+      if event.rrule.present?
 
         # loop till days
         interval_frame_start = Date.parse("#{1.year.ago}-01-01")

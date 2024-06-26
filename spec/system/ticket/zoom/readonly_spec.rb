@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -55,9 +55,9 @@ RSpec.describe 'Ticket Access Zoom', authenticated_as: :user, type: :system do
     include_examples 'elements'
 
     it 'shows tag, and link modification buttons' do
-      expect(page).to have_selector('.tags .icon-diagonal-cross')
+      expect(page).to have_css('.tags .icon-diagonal-cross')
       expect(page).to have_content('+ Add Tag')
-      expect(page).to have_selector('.links .icon-diagonal-cross')
+      expect(page).to have_css('.links .icon-diagonal-cross')
       expect(page).to have_content('+ Add Link')
     end
 

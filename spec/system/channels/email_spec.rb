@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -36,6 +36,9 @@ RSpec.describe 'Manage > Channels > Email', type: :system do
         'Channel::Driver::Imap'.constantize
         # The normal timeout may be too low in slow CI environments.
         stub_const 'Channel::Driver::Imap::CHECK_ONLY_TIMEOUT', 1.minute
+
+        # Import mail server CA certificate into the trust store.
+        SSLCertificate.create!(certificate: Rails.root.join('spec/fixtures/files/imap/ca.crt').read)
       end
 
       it 'refuses wrong credentials' do
@@ -47,7 +50,7 @@ RSpec.describe 'Manage > Channels > Email', type: :system do
           fill_in 'realname', with: 'My System'
           fill_in 'email',    with: "unknown_user.#{mailbox_user}"
           fill_in 'password', with: mailbox_password
-          select 'Users', from: 'group_id'
+          set_tree_select_value('group_id', Group.first.name)
           click '.js-submit'
           expect(page).to have_text('The server settings could not be automatically detected. Please configure them manually.')
         end
@@ -63,7 +66,7 @@ RSpec.describe 'Manage > Channels > Email', type: :system do
           fill_in 'realname', with: 'My System'
           fill_in 'email',    with: mailbox_user
           fill_in 'password', with: mailbox_password
-          select 'Users', from: 'group_id'
+          set_tree_select_value('group_id', Group.first.name)
           click '.js-submit'
         end
 
@@ -166,6 +169,37 @@ RSpec.describe 'Manage > Channels > Email', type: :system do
       end
     end
 
+    it 'in the expert form, turning on SSL allows to turn on or off SSL verification' do
+      click '.js-channelNew'
+
+      in_modal do
+        click '.js-expert'
+
+        verify_select = find('select[name="options::ssl_verify"]')
+        ssl_select    = find('select[name="options::ssl"]')
+
+        expect(page)
+          .to have_select('options::ssl_verify', selected: 'yes')
+          .and have_no_text('Turning off SSL verification')
+
+        verify_select.find(:option, 'no').select_option
+
+        expect(page).to have_text('Turning off SSL verification')
+
+        verify_select.find(:option, 'yes').select_option
+
+        expect(page).to have_no_text('Turning off SSL verification')
+
+        ssl_select.find(:option, 'No SSL').select_option
+
+        expect(verify_select).to be_disabled
+
+        ssl_select.find(:option, 'STARTTLS').select_option
+
+        expect(verify_select).not_to be_disabled
+      end
+    end
+
     it 'entered values on the default form are copied to the expert form' do
       click '.js-channelNew'
 
@@ -196,6 +230,64 @@ RSpec.describe 'Manage > Channels > Email', type: :system do
         expect(page).to have_no_text 'ORGANIZATION & DEPARTMENT NAME'
         expect(page).to have_no_text 'ORGANIZATION SUPPORT'
         expect(page).to have_no_text 'EMAIL'
+      end
+    end
+
+    context 'with SSL verification off' do
+      before do
+        channel = Channel.find(1)
+        channel.options[:inbound][:options][:ssl_verify] = false
+        channel.save!
+      end
+
+      it 'has SSL verification switch in inbound form' do
+        visit '#channels/email'
+        click '.js-channelEnable'
+        click '.js-editInbound'
+
+        in_modal do
+          expect(page)
+            .to have_select('options::ssl_verify', selected: 'no')
+            .and have_text('Turning off SSL verification')
+
+          verify_select = find('select[name="options::ssl_verify"]')
+
+          verify_select.find(:option, 'yes').select_option
+
+          expect(page).to have_no_text('Turning off SSL verification')
+
+          verify_select.find(:option, 'no').select_option
+
+          expect(page).to have_text('Turning off SSL verification')
+        end
+      end
+    end
+  end
+
+  context 'when editing outbound email settings' do
+    it 'has SSL verification switch in outbound form' do
+      visit '#channels/email'
+      click '.js-channelEnable'
+      click '.js-editOutbound'
+
+      in_modal do
+        adapter_select = find('select[name="adapter"]')
+
+        adapter_select.find(:option, 'SMTP - configure your own outgoing SMTP settings').select_option
+
+        verify_select = find('select[name="options::ssl_verify"]')
+
+        expect(page)
+          .to have_select('options::ssl_verify', selected: 'yes')
+          .and have_no_text('Turning off SSL verification')
+
+        verify_select.find(:option, 'no').select_option
+
+        expect(page).to have_text('Turning off SSL verification')
+
+        verify_select.find(:option, 'yes').select_option
+
+        expect(page).to have_no_text('Turning off SSL verification')
       end
     end
   end

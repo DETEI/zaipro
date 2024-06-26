@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -13,21 +13,23 @@ RSpec.describe EmailHelper::Verify, integration: true, required_envs: %w[MAIL_SE
         inbound:  {
           adapter: 'imap',
           options: {
-            host:     ENV['MAIL_SERVER'],
-            port:     993,
-            ssl:      true,
-            user:     mailbox_user,
-            password: mailbox_password,
+            host:       ENV['MAIL_SERVER'],
+            port:       993,
+            ssl:        true,
+            user:       mailbox_user,
+            password:   mailbox_password,
+            ssl_verify: false,
           },
         },
         outbound: {
           adapter: 'smtp',
           options: {
-            host:     ENV['MAIL_SERVER'],
-            port:     25,
-            ssl:      false,
-            user:     mailbox_user,
-            password: mailbox_password,
+            host:       ENV['MAIL_SERVER'],
+            port:       25,
+            ssl:        false,
+            user:       mailbox_user,
+            password:   mailbox_password,
+            ssl_verify: false,
           },
         },
         sender:   mailbox_user,

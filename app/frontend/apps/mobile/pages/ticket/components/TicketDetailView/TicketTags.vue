@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { ref, toRef, watch } from 'vue'
@@ -74,6 +74,7 @@ const handleChangedTicketTags = (node: FormKitNode) => {
       name="tags"
       :label="__('Tags')"
       :plugins="[handleChangedTicketTags]"
+      :can-create="Boolean($c.tag_new)"
     ></FormKit>
   </FormGroup>
 </template>

@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { computed, ref, toRef } from 'vue'
@@ -132,7 +132,8 @@ const processSearchKeydown = (event: KeyboardEvent) => {
   if (!filter.value) return
   if (['Enter', 'Tab', ','].includes(key)) {
     stopEvent(event)
-    createTag()
+
+    if (props.context.canCreate) createTag()
   }
 }
 </script>

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module ApplicationModel::CanAssets
   extend ActiveSupport::Concern
@@ -73,6 +73,7 @@ get assets and record_ids of selector
   def assets_of_single_selector(item, content, assets = {})
     area, key = item.split('.')
     return if !key
+    return if %w[ticket_customer ticket_owner].include?(area)
 
     area = 'user' if %w[customer session].include? area
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import type { FormSchemaNode } from '#shared/components/Form/types.ts'
 
@@ -6,7 +6,6 @@ type FormSchemaOptions = {
   showDirtyMark: boolean
 }
 
-// TODO: do we need this?
 export const defineFormSchema = (
   schema: FormSchemaNode[],
   options?: FormSchemaOptions,

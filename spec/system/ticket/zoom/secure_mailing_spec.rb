@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -375,7 +375,7 @@ RSpec.describe 'Ticket zoom > Secure mailing', authenticated_as: :authenticate, 
             all('a[data-type=emailReply]').last.click
             find('.articleNewEdit-body').send_keys('Test')
 
-            select new_group.name, from: 'group_id'
+            set_tree_select_value('group_id', new_group.name)
           end
         end
 

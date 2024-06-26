@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 RSpec.shared_examples 'core workflow' do
   let(:field_name) { SecureRandom.hex(10) }
@@ -1125,9 +1125,9 @@ RSpec.shared_examples 'core workflow' do
 
       it 'does perform' do
         before_it.call
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Incident', visible: :all)
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Hardware', visible: :all)
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Monitor', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Incident', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Hardware', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Monitor', visible: :all)
         expect(page).to have_no_selector('span.searchableSelect-option-text', text: 'Mouse', visible: :all)
         expect(page).to have_no_selector('span.searchableSelect-option-text', text: 'Softwareproblem', visible: :all)
       end
@@ -1325,9 +1325,9 @@ RSpec.shared_examples 'core workflow' do
 
       it 'does perform' do
         before_it.call
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Incident', visible: :all)
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Hardware', visible: :all)
-        expect(page).to have_selector('span.searchableSelect-option-text', text: 'Monitor', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Incident', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Hardware', visible: :all)
+        expect(page).to have_css('span.searchableSelect-option-text', text: 'Monitor', visible: :all)
         expect(page).to have_no_selector('span.searchableSelect-option-text', text: 'Mouse', visible: :all)
         expect(page).to have_no_selector('span.searchableSelect-option-text', text: 'Softwareproblem', visible: :all)
       end
@@ -1347,7 +1347,7 @@ RSpec.shared_examples 'core workflow' do
 
       it 'does perform' do
         before_it.call
-        expect(page).to have_selector('span.token-label', text: 'Incident › Hardware › Monitor')
+        expect(page).to have_css('span.token-label', text: 'Incident › Hardware › Monitor')
       end
     end
 
@@ -1373,7 +1373,7 @@ RSpec.shared_examples 'core workflow' do
 
       it 'does perform' do
         before_it.call
-        expect(page).to have_selector('span.token-label', text: 'Incident')
+        expect(page).to have_css('span.token-label', text: 'Incident')
       end
     end
   end

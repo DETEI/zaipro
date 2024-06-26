@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -12,7 +12,7 @@ RSpec.describe 'Manage > Settings > Branding', type: :system do
       within :active_content do
         within '#product_name' do
           fill_in 'product_name', with: new_name
-          click_on 'Submit'
+          click_button 'Submit'
         end
       end
 

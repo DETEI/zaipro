@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -11,6 +11,110 @@ RSpec.describe Authorization, type: :model do
       create(:twitter_authorization, provider: 'twitter2', user: authorization.user)
       assets = authorization.user.reload.assets({})
       expect(assets[:User][authorization.user.id]['accounts'].keys.count).to eq(2)
+    end
+  end
+
+  describe 'Account linking' do
+    let(:auth_hash) do
+      {
+        'info'        => auth_info,
+        'uid'         => auth_uid,
+        'provider'    => provider,
+        'credentials' => auth_credentials,
+      }
+    end
+    let(:auth_info) { {} }
+    let(:auth_uid)  { SecureRandom.uuid }
+    let(:auth_credentials) do
+      {
+        'token'  => '1234',
+        'secret' => '1234',
+      }
+    end
+    let(:provider) { 'saml' }
+    let(:user) { create(:user, login: auth_uid) }
+
+    before do
+      Setting.set('auth_third_party_auto_link_at_inital_login', true)
+
+      user
+    end
+
+    shared_examples 'links account with email address', :aggregate_failures do
+      it 'linked account' do
+        authorization = described_class.create_from_hash(auth_hash)
+
+        expect(authorization.user_id).to eq(user.id)
+        expect(authorization.provider).to eq(provider)
+      end
+    end
+
+    context 'when saml is the provider' do
+      context 'when auth provider provides no email address' do
+        it 'linked account with uid' do
+          authorization = described_class.create_from_hash(auth_hash)
+
+          expect(authorization.user_id).to eq(user.id)
+        end
+      end
+    end
+
+    context 'when auth provider provides an email address' do
+      let(:email) { 'john.doe@example.com' }
+      let(:auth_info) do
+        {
+          'email' => email,
+        }
+      end
+      let(:user) { create(:user, login: auth_uid, email: email) }
+
+      context 'when "github" is the provider' do
+        let(:provider) { 'github' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "gitlab" is the provider' do
+        let(:provider) { 'gitlab' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "facebook" is the provider' do
+        let(:provider) { 'facebook' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "twitter" is the provider' do
+        let(:provider) { 'twitter' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "linkedin" is the provider' do
+        let(:provider) { 'linkedin' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "microsoft_office365" is the provider' do
+        let(:provider) { 'microsoft_office365' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "google_oauth2" is the provider' do
+        let(:provider) { 'google_oauth2' }
+
+        include_examples 'links account with email address'
+      end
+
+      context 'when "weibo" is the provider' do
+        let(:provider) { 'weibo' }
+
+        include_examples 'links account with email address'
+      end
     end
   end
 

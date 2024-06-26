@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { useEditedBy } from '#mobile/composables/useEditedBy.ts'
@@ -24,7 +24,6 @@ const { stringUpdated } = useEditedBy(toRef(props, 'entity'))
       class="flex flex-1 flex-col overflow-hidden border-b border-white/10 py-3 text-gray-100"
     >
       <span class="truncate">
-        <!-- TODO: Should we show open or closed or nothing at all? -->
         {{
           entity.ticketsCount?.open === 1
             ? `1 ${$t('ticket')}`

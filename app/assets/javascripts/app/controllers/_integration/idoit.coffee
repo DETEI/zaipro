@@ -20,12 +20,16 @@ class Idoit extends App.ControllerIntegrationBase
     )
 
 class Form extends App.Controller
+  elements:
+    '.js-sslVerifyAlert': 'sslVerifyAlert'
   events:
-    'submit form': 'update'
+    'change .js-sslVerify select': 'handleSslVerifyAlert'
+    'submit form':                 'update'
 
   constructor: ->
     super
     @render()
+    @handleSslVerifyAlert()
 
   currentConfig: ->
     App.Setting.get('idoit_config')
@@ -36,9 +40,21 @@ class Form extends App.Controller
   render: =>
     @config = @currentConfig()
 
-    @html App.view('integration/idoit')(
-      config: @config
+    verify_ssl = App.UiElement.boolean.render(
+      name: 'verify_ssl'
+      null: false
+      default: true
+      value: @config.verify_ssl
+      class: 'form-control form-control--small'
     )
+
+    content = $(App.view('integration/idoit')(
+      config: @config
+    ))
+
+    content.find('.js-sslVerify').html verify_ssl
+
+    @html content
 
   update: (e) =>
     e.preventDefault()
@@ -55,6 +71,7 @@ class Form extends App.Controller
         api_token: @config.api_token
         endpoint: @config.endpoint
         client_id: @config.client_id
+        verify_ssl: @config.verify_ssl
       )
       success: (data, status, xhr) =>
         if data.result is 'failed'
@@ -76,6 +93,12 @@ class Form extends App.Controller
           msg:  App.i18n.translateContent(details.error_human || details.error || __('Saving failed.'))
         )
     )
+
+  handleSslVerifyAlert: =>
+    if @formParam(@el).verify_ssl
+      @sslVerifyAlert.addClass('hide')
+    else
+      @sslVerifyAlert.removeClass('hide')
 
 class State
   @current: ->

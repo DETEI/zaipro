@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 RSpec.describe 'Clearbit', aggregate_failures: true, current_user_id: 1, integration: true, performs_jobs: true, required_envs: %w[CLEARBIT_CI_API_KEY] do
@@ -387,8 +387,8 @@ RSpec.describe 'Clearbit', aggregate_failures: true, current_user_id: 1, integra
       expect(ExternalSync).to be_exist(source: 'clearbit', object: 'Organization', o_id: customer.organization.id)
 
       expect(customer.organization).to have_attributes(
-        name: 'Clearbit',
-        note: 'Clearbit is a B2B marketing intelligence company that provides go-to-market teams with a comprehensive B2B dataset across company, contact, and IP intelligence. They offer APIs that serve as a data backbone for business decisions, allowing users to enr...',
+        name: be_present,
+        note: %r{Clearbit},
       )
     end
   end

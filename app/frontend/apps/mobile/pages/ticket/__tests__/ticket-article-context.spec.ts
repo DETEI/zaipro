@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+// Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 import { visitView } from '#tests/support/components/visitView.ts'
 import { mockPermissions } from '#tests/support/mock-permissions.ts'
@@ -16,7 +16,13 @@ describe('actions inside article context', () => {
   test('opens metadata', async () => {
     const { waitUntilTicketLoaded } = mockTicketDetailViewGql()
 
-    const view = await visitView('/tickets/1')
+    const view = await visitView('/tickets/1', {
+      global: {
+        stubs: {
+          transition: false,
+        },
+      },
+    })
 
     await waitUntilTicketLoaded()
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 module Gql::Queries
   class TextModule::Suggestions < BaseQuery
@@ -21,7 +21,7 @@ module Gql::Queries
     def find_text_modules(query:, limit:)
       ::TextModule.joins('LEFT OUTER JOIN groups_text_modules ON groups_text_modules.text_module_id = text_modules.id')
         .distinct
-        .where('((text_modules.name LIKE :query) OR (text_modules.keywords LIKE :query))', query: "%#{query.strip}%")
+        .where('((text_modules.name LIKE :query) OR (text_modules.keywords LIKE :query))', query: "%#{SqlHelper.quote_like(query.strip)}%")
         .where(active: true)
         .where(where_agent_having_groups)
         .limit(limit)

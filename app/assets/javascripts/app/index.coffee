@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 #= require_self
 #= require_tree ./lib/app_init
@@ -51,9 +51,18 @@ class App extends Spine.Controller
 
   # define print name helper
   @viewPrintItem: (item, attributeConfig = {}, valueRef, table, object) ->
+
+    # Show all "empty" values as a simple dash (-):
+    #   - undefined
+    #   - empty string
+    #   - null
+    #   - empty object ({})
+    #   - empty array ([] or [''])
     return '-' if item is undefined
     return '-' if item is ''
     return '-' if item is null
+    return '-' if typeof item isnt 'function' and _.isObject(item) and _.isEmpty(item)
+    return '-' if _.isArray(item) and (_.isEmpty(item) or _.isEmpty(_.filter(item, (i) -> i isnt '')))
     result = ''
     items = [item]
     if _.isArray(item)
@@ -74,6 +83,10 @@ class App extends Spine.Controller
         else
           item = App[attributeConfig.relation].find(item)
 
+      # check if parent structure
+      if object?.constructor?.has_parents && attributeConfig.name is 'name'
+        resultLocal = object.displayName()
+
       # if date is a object, get name of the object
       isObject = false
       if item && typeof item is 'object'
@@ -82,8 +95,10 @@ class App extends Spine.Controller
           resultLocal = item.displayNameLong()
         else if item.displayName
           resultLocal = item.displayName()
-        else
+        else if not _.isUndefined(item.name)
           resultLocal = item.name
+        else
+          resultLocal = item.label
 
       # execute callback on content
       if attributeConfig.callback

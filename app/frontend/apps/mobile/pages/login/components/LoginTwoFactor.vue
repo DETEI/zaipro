@@ -1,4 +1,4 @@
-<!-- Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/ -->
+<!-- Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/ -->
 
 <script setup lang="ts">
 import { useNotifications } from '#shared/components/CommonNotifications/useNotifications.ts'
@@ -29,7 +29,6 @@ const emit = defineEmits<{
   (e: 'error', error: UserError): void
 }>()
 
-// TODO: this should be configurable by two factor plugin
 const schema: FormSchemaNode[] = [
   {
     isLayout: true,

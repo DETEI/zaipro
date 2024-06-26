@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 class Issue3829BrokenAvatars < ActiveRecord::Migration[6.1]
   def change
@@ -8,7 +8,7 @@ class Issue3829BrokenAvatars < ActiveRecord::Migration[6.1]
     object_name = 'User'
     object_id = ObjectLookup.by_name(object_name)
 
-    User.all.pluck(:id, :image_source).each do |user_id, image_source|
+    User.pluck(:id, :image_source).each do |user_id, image_source|
       next if image_source.blank?
       next if image_source.match?(%r{\.(?:png|jpg|jpeg)}i)
 

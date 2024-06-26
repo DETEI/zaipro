@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
@@ -15,6 +15,7 @@ end
 
 # clear old caches to start from scratch
 Rails.cache.clear
+ApplicationModel.reset_column_information
 
 # this is the __ordered__ list of seed files
 # extend only if needed - try to add your changes
@@ -28,9 +29,10 @@ seeds.each do |seed|
   load Rails.root.join('db', 'seeds', "#{seed}.rb")
 end
 
-# set basic Rails server settings via environment variables
+# set basic settings via environment variables
 Setting.set('http_type', ENV['ZAMMAD_HTTP_TYPE']) if ENV['ZAMMAD_HTTP_TYPE']
 Setting.set('fqdn',      ENV['ZAMMAD_FQDN'])      if ENV['ZAMMAD_FQDN']
+Setting.set('storage_provider', 'S3')             if ENV['S3_URL']
 
 # reset primary key sequences
 DbHelper.import_post

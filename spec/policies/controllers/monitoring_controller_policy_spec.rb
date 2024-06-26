@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2023 Zammad Foundation, https://zammad-foundation.org/
+# Copyright (C) 2012-2024 Zammad Foundation, https://zammad-foundation.org/
 
 require 'rails_helper'
 
@@ -126,8 +126,8 @@ describe Controllers::MonitoringControllerPolicy do
       context 'when token given' do
         let(:token) { Setting.get('monitoring_token') }
 
-        it 'returns false' do
-          expect(instance.send(:token_or_permission?)).to be_falsey
+        it 'returns true' do
+          expect(instance.send(:token_or_permission?)).to be_truthy
         end
       end
     end
